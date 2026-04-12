@@ -2,21 +2,23 @@ import 'dotenv/config';
 
 export default {
   "expo": {
-    "name": "H-Fire Admin",
+    "name": "H-Fire: Admin Monitoring Center",
     "slug": "h-fire-admin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "hfireAdmin",
+    "scheme": "hfire-admin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.hfire.admin",
       "config": {
         "googleMapsApiKey": process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
       }
     },
     "android": {
+      "package": "com.hfire.admin",
       "adaptiveIcon": {
         "backgroundColor": "#1A0000",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -39,6 +41,15 @@ export default {
       "expo-router",
       "expo-web-browser",
       "expo-secure-store",
+      "expo-notifications",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "h-fire-admin",
+          "organization": "rhein-tigle"
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -52,6 +63,11 @@ export default {
         }
       ]
     ],
+    "extra": {
+      "eas": {
+        "projectId": "d0403495-fd03-4057-89f9-e79b3fb22190"
+      }
+    },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
