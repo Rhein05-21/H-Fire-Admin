@@ -141,11 +141,11 @@ export default function AdminMapScreen() {
       <View style={[styles.legend, { backgroundColor: isDark ? 'rgba(10,10,10,0.85)' : 'rgba(255,255,255,0.9)' }]}>
         <View style={styles.legendRow}>
           <View style={[styles.legendDot, { backgroundColor: ACCENT }]} />
-          <Text style={[styles.legendText, { color: isDark ? '#ccc' : '#444' }]}>FIRE (>1500 PPM)</Text>
+          <Text style={[styles.legendText, { color: isDark ? '#ccc' : '#444' }]}>FIRE ({'>'}1500 PPM)</Text>
         </View>
         <View style={styles.legendRow}>
           <View style={[styles.legendDot, { backgroundColor: '#FF9500' }]} />
-          <Text style={[styles.legendText, { color: isDark ? '#ccc' : '#444' }]}>WARNING (>450 PPM)</Text>
+          <Text style={[styles.legendText, { color: isDark ? '#ccc' : '#444' }]}>WARNING ({'>'}450 PPM)</Text>
         </View>
         <View style={styles.legendRow}>
           <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />

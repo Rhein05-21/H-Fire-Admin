@@ -1,0 +1,738 @@
+Running 'gradlew :app:assembleRelease' in /home/expo/workingdir/build/android
+Downloading https://services.gradle.org/distributions/gradle-8.14.3-bin.zip
+10%
+20%
+30%.
+40%.
+50%.
+60%.
+70%
+80%.
+90%.
+100%
+Welcome to Gradle 8.14.3!
+Here are the highlights of this release:
+ - Java 24 support
+ - GraalVM Native Image toolchain selection
+- Enhancements to test reporting
+ - Build Authoring improvements
+For more details see https://docs.gradle.org/8.14.3/release-notes.html
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Configure project :expo-gradle-plugin:expo-autolinking-plugin
+w: file:///home/expo/workingdir/build/node_modules/expo-modules-autolinking/android/expo-gradle-plugin/expo-autolinking-plugin/build.gradle.kts:25:3: 'kotlinOptions(KotlinJvmOptionsDeprecated /* = KotlinJvmOptions */.() -> Unit): Unit' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln
+> Configure project :expo-gradle-plugin:expo-autolinking-settings-plugin
+w: file:///home/expo/workingdir/build/node_modules/expo-modules-autolinking/android/expo-gradle-plugin/expo-autolinking-settings-plugin/build.gradle.kts:30:3: 'kotlinOptions(KotlinJvmOptionsDeprecated /* = KotlinJvmOptions */.() -> Unit): Unit' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln
+> Task :gradle-plugin:shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:settings-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :gradle-plugin:settings-plugin:pluginDescriptors
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:pluginDescriptors
+> Task :gradle-plugin:settings-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:processResources NO-SOURCE
+> Task :gradle-plugin:shared:compileKotlin
+> Task :gradle-plugin:shared:compileJava NO-SOURCE
+> Task :gradle-plugin:shared:classes UP-TO-DATE
+> Task :gradle-plugin:shared:jar
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:compileKotlin
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:classes UP-TO-DATE
+> Task :expo-gradle-plugin:expo-autolinking-plugin-shared:jar
+> Task :gradle-plugin:settings-plugin:compileKotlin
+> Task :gradle-plugin:settings-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:settings-plugin:classes
+> Task :gradle-plugin:settings-plugin:jar
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:compileKotlin
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:classes
+> Task :expo-gradle-plugin:expo-autolinking-settings-plugin:jar
+> Configure project :expo-module-gradle-plugin
+w: file:///home/expo/workingdir/build/node_modules/expo-modules-core/expo-module-gradle-plugin/build.gradle.kts:58:3: 'kotlinOptions(KotlinJvmOptionsDeprecated /* = KotlinJvmOptions */.() -> Unit): Unit' is deprecated. Please migrate to the compilerOptions DSL. More details are here: https://kotl.in/u1r8ln
+> Task :gradle-plugin:react-native-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-gradle-plugin:expo-autolinking-plugin:checkKotlinGradlePluginConfigurationErrors
+SKIPPED
+> Task :expo-module-gradle-plugin:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-module-gradle-plugin:pluginDescriptors
+> Task :expo-module-gradle-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-plugin:pluginDescriptors
+> Task :expo-gradle-plugin:expo-autolinking-plugin:processResources
+> Task :gradle-plugin:react-native-gradle-plugin:pluginDescriptors
+> Task :gradle-plugin:react-native-gradle-plugin:processResources
+> Task :expo-gradle-plugin:expo-autolinking-plugin:compileKotlin
+> Task :expo-gradle-plugin:expo-autolinking-plugin:compileJava NO-SOURCE
+> Task :expo-gradle-plugin:expo-autolinking-plugin:classes
+> Task :expo-gradle-plugin:expo-autolinking-plugin:jar
+> Task :gradle-plugin:react-native-gradle-plugin:compileKotlin
+> Task :gradle-plugin:react-native-gradle-plugin:compileJava
+NO-SOURCE
+> Task :gradle-plugin:react-native-gradle-plugin:classes
+> Task :gradle-plugin:react-native-gradle-plugin:jar
+> Task :expo-module-gradle-plugin:compileKotlin
+w: file:///home/expo/workingdir/build/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/android/AndroidLibraryExtension.kt:9:24 'var targetSdk: Int?' is deprecated. Will be removed from library DSL in v9.0. Use testOptions.targetSdk or/and lint.targetSdk instead.
+> Task :expo-module-gradle-plugin:compileJava NO-SOURCE
+> Task :expo-module-gradle-plugin:classes
+> Task :expo-module-gradle-plugin:jar
+> Configure project :
+[32m[ExpoRootProject][0m Using the following versions:
+  - buildTools:  [32m36.0.0[0m
+  - minSdk:      [32m24[0m
+- compileSdk:  [32m36[0m
+  - targetSdk:   [32m36[0m
+  - ndk:         [32m27.1.12297006[0m
+  - kotlin:      [32m2.1.20[0m
+  - ksp:         [32m2.1.20-2.0.1[0m
+> Configure project :expo
+Using expo modules
+  - [32mexpo-constants[0m (18.0.13)
+  - [32mexpo-modules-core[0m (3.0.29)
+- [33m[📦][0m [32mexpo-application[0m (7.0.8)
+  - [33m[📦][0m [32mexpo-asset[0m (12.0.12)
+  - [33m[📦][0m [32mexpo-av[0m (16.0.8)
+  - [33m[📦][0m [32mexpo-crypto[0m (15.0.8)
+  - [33m[📦][0m [32mexpo-file-system[0m (19.0.21)
+  - [33m[📦][0m [32mexpo-font[0m (14.0.11)
+  - [33m[📦][0m [32mexpo-haptics[0m (15.0.8)
+- [33m[📦][0m [32mexpo-image[0m (3.0.11)
+  - [33m[📦][0m [32mexpo-keep-awake[0m (15.0.8)
+  - [33m[📦][0m [32mexpo-linking[0m (8.0.11)
+  - [33m[📦][0m [32mexpo-location[0m (19.0.8)
+  - [33m[📦][0m [32mexpo-notifications[0m (0.32.16)
+  - [33m[📦][0m [32mexpo-secure-store[0m (15.0.8)
+  - [33m[📦][0m [32mexpo-splash-screen[0m (31.0.13)
+  - [33m[📦][0m [32mexpo-system-ui[0m (6.0.9)
+  - [33m[📦][0m [32mexpo-web-browser[0m (15.0.10)
+Checking the license for package Android SDK Build-Tools 36 in /home/expo/Android/Sdk/licenses
+License for package Android SDK Build-Tools 36 accepted.
+Preparing "Install Android SDK Build-Tools 36 v.36.0.0".
+"Install Android SDK Build-Tools 36 v.36.0.0" ready.
+Installing Android SDK Build-Tools 36 in /home/expo/Android/Sdk/build-tools/36.0.0
+"Install Android SDK Build-Tools 36 v.36.0.0" complete.
+"Install Android SDK Build-Tools 36 v.36.0.0" finished.
+[=========                              ] 25%
+[=========                              ] 25% Fetch remote repository...        
+[=======================================] 100% Fetch remote repository...
+> Task :react-native-community_netinfo:preBuild UP-TO-DATE
+> Task :expo-modules-core:preBuild UP-TO-DATE
+> Task :react-native-maps:preBuild UP-TO-DATE
+> Task :app:generateAutolinkingNewArchitectureFiles
+> Task :app:generateAutolinkingPackageList
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generateReactNativeEntryPoint
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask
+> Task :react-native-reanimated:assertNewArchitectureEnabledTask SKIPPED
+> Task :react-native-worklets:assertMinimalReactNativeVersionTask
+> Task :react-native-worklets:assertNewArchitectureEnabledTask SKIPPED
+> Task :react-native-reanimated:assertWorkletsVersionTask
+> Task :react-native-gesture-handler:generateCodegenSchemaFromJavaScript
+> Task :react-native-async-storage_async-storage:generateCodegenSchemaFromJavaScript
+> Task :react-native-safe-area-context:generateCodegenSchemaFromJavaScript
+> Task :react-native-screens:generateCodegenSchemaFromJavaScript
+> Task :react-native-worklets:generateCodegenSchemaFromJavaScript
+> Task :react-native-reanimated:generateCodegenSchemaFromJavaScript
+> Task :expo-constants:createExpoConfig
+> Task :expo-constants:preBuild
+The NODE_ENV environment variable is required but was not specified. Ensure the project is bundled with Expo CLI or NODE_ENV is set. Using only .env.local and .env
+> Task :react-native-gesture-handler:generateCodegenArtifactsFromSchema
+> Task :react-native-gesture-handler:preBuild
+> Task :react-native-async-storage_async-storage:generateCodegenArtifactsFromSchema
+> Task :react-native-async-storage_async-storage:preBuild
+> Task :expo-constants:preReleaseBuild
+> Task :react-native-safe-area-context:generateCodegenArtifactsFromSchema
+> Task :react-native-safe-area-context:preBuild
+> Task :expo-modules-core:preReleaseBuild UP-TO-DATE
+> Task :react-native-reanimated:generateCodegenArtifactsFromSchema
+> Task :react-native-worklets:generateCodegenArtifactsFromSchema
+> Task :expo-constants:mergeReleaseJniLibFolders
+> Task :expo-constants:mergeReleaseNativeLibs NO-SOURCE
+> Task :sentry_react-native:generateCodegenSchemaFromJavaScript
+> Task :react-native-screens:generateCodegenArtifactsFromSchema
+> Task :react-native-screens:preBuild
+> Task :react-native-async-storage_async-storage:preReleaseBuild
+> Task :expo:generatePackagesList
+> Task :expo:preBuild
+> Task :expo:preReleaseBuild
+> Task :expo-constants:copyReleaseJniLibsProjectOnly
+> Task :react-native-community_netinfo:preReleaseBuild UP-TO-DATE
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateCodegenSchemaFromJavaScript
+> Task :expo:mergeReleaseJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeReleaseJniLibFolders
+> Task :react-native-worklets:prepareWorkletsHeadersForPrefabs
+> Task :react-native-worklets:preBuild
+> Task :react-native-worklets:preReleaseBuild
+> Task :expo:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-community_netinfo:mergeReleaseJniLibFolders
+> Task :react-native-async-storage_async-storage:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-community_netinfo:mergeReleaseNativeLibs NO-SOURCE
+> Task :expo:copyReleaseJniLibsProjectOnly
+> Task :react-native-gesture-handler:preReleaseBuild
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectOnly
+> Task :react-native-maps:preReleaseBuild UP-TO-DATE
+> Task :react-native-reanimated:prepareReanimatedHeadersForPrefabs
+> Task :react-native-reanimated:preBuild
+> Task :react-native-reanimated:preReleaseBuild
+> Task :react-native-gesture-handler:mergeReleaseJniLibFolders
+> Task :react-native-safe-area-context:preReleaseBuild
+> Task :react-native-community_netinfo:copyReleaseJniLibsProjectOnly
+> Task :react-native-screens:preReleaseBuild
+> Task :react-native-maps:mergeReleaseJniLibFolders
+> Task :react-native-reanimated:mergeReleaseJniLibFolders
+> Task :react-native-gesture-handler:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-maps:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:mergeReleaseJniLibFolders
+> Task :react-native-maps:copyReleaseJniLibsProjectOnly
+> Task :react-native-safe-area-context:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectOnly
+> Task :react-native-safe-area-context:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-safe-area-context:generateReleaseBuildConfig
+> Task :react-native-gesture-handler:generateReleaseBuildConfig
+> Task :react-native-reanimated:generateReleaseBuildConfig
+> Task :react-native-reanimated:generateReleaseResValues
+> Task :react-native-gesture-handler:generateReleaseResValues
+> Task :react-native-safe-area-context:generateReleaseResValues
+> Task :react-native-gesture-handler:generateReleaseResources
+> Task :react-native-reanimated:generateReleaseResources
+> Task :react-native-safe-area-context:generateReleaseResources
+> Task :react-native-gesture-handler:packageReleaseResources
+> Task :react-native-reanimated:packageReleaseResources
+> Task :react-native-safe-area-context:packageReleaseResources
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateCodegenArtifactsFromSchema
+> Task :solana-mobile_mobile-wallet-adapter-protocol:preBuild
+> Task :solana-mobile_mobile-wallet-adapter-protocol:preReleaseBuild
+> Task :sentry_react-native:generateCodegenArtifactsFromSchema
+> Task :sentry_react-native:preBuild
+> Task :app:preBuild
+> Task :app:preReleaseBuild
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseJniLibFolders
+> Task :sentry_react-native:preReleaseBuild
+> Task :app:mergeReleaseJniLibFolders
+> Task :sentry_react-native:mergeReleaseJniLibFolders
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseNativeLibs NO-SOURCE
+> Task :sentry_react-native:mergeReleaseNativeLibs NO-SOURCE
+> Task :solana-mobile_mobile-wallet-adapter-protocol:copyReleaseJniLibsProjectOnly
+> Task :solana-mobile_mobile-wallet-adapter-protocol:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :sentry_react-native:copyReleaseJniLibsProjectOnly
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseBuildConfig
+> Task :react-native-async-storage_async-storage:generateReleaseBuildConfig
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseResValues
+> Task :react-native-async-storage_async-storage:generateReleaseResValues
+> Task :react-native-async-storage_async-storage:generateReleaseResources
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseResources
+> Task :solana-mobile_mobile-wallet-adapter-protocol:packageReleaseResources
+> Task :react-native-async-storage_async-storage:packageReleaseResources
+> Task :react-native-gesture-handler:parseReleaseLocalResources
+> Task :react-native-async-storage_async-storage:parseReleaseLocalResources
+> Task :react-native-safe-area-context:parseReleaseLocalResources
+> Task :solana-mobile_mobile-wallet-adapter-protocol:parseReleaseLocalResources
+> Task :react-native-reanimated:parseReleaseLocalResources
+> Task :react-native-reanimated:javaPreCompileRelease
+> Task :react-native-async-storage_async-storage:generateReleaseRFile
+> Task :react-native-gesture-handler:generateReleaseRFile
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseRFile
+> Task :react-native-safe-area-context:generateReleaseRFile
+> Task :react-native-reanimated:generateReleaseRFile
+> Task :react-native-async-storage_async-storage:javaPreCompileRelease
+> Task :react-native-gesture-handler:javaPreCompileRelease
+> Task :react-native-community_netinfo:generateReleaseBuildConfig
+> Task :sentry_react-native:generateReleaseBuildConfig
+> Task :react-native-community_netinfo:generateReleaseResValues
+> Task :sentry_react-native:generateReleaseResValues
+> Task :react-native-community_netinfo:generateReleaseResources
+> Task :sentry_react-native:generateReleaseResources
+> Task :sentry_react-native:packageReleaseResources
+> Task :react-native-community_netinfo:packageReleaseResources
+> Task :react-native-community_netinfo:parseReleaseLocalResources
+> Task :sentry_react-native:parseReleaseLocalResources
+> Task :react-native-community_netinfo:javaPreCompileRelease
+> Task :react-native-community_netinfo:generateReleaseRFile
+> Task :sentry_react-native:generateReleaseRFile
+> Task :sentry_react-native:javaPreCompileRelease
+> Task :expo-modules-core:configureCMakeRelWithDebInfo[arm64-v8a]
+Checking the license for package CMake 3.22.1 in /home/expo/Android/Sdk/licenses
+License for package CMake 3.22.1 accepted.
+Preparing "Install CMake 3.22.1 v.3.22.1".
+"Install CMake 3.22.1 v.3.22.1" ready.
+Installing CMake 3.22.1 in /home/expo/Android/Sdk/cmake/3.22.1
+"Install CMake 3.22.1 v.3.22.1" complete.
+"Install CMake 3.22.1 v.3.22.1" finished.
+> Task :react-native-safe-area-context:compileReleaseKotlin
+w: file:///home/expo/workingdir/build/node_modules/react-native-safe-area-context/android/src/main/java/com/th3rdwave/safeareacontext/SafeAreaView.kt:59:23 'val uiImplementation: UIImplementation!' is deprecated. Deprecated in Java.
+> Task :solana-mobile_mobile-wallet-adapter-protocol:compileReleaseKotlin
+w: file:///home/expo/workingdir/build/node_modules/@solana-mobile/mobile-wallet-adapter-protocol/android/src/main/java/com/solanamobile/mobilewalletadapter/reactnative/SolanaMobileWalletAdapterPackage.kt:3:8 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
+w: file:///home/expo/workingdir/build/node_modules/@solana-mobile/mobile-wallet-adapter-protocol/android/src/main/java/com/solanamobile/mobilewalletadapter/reactnative/SolanaMobileWalletAdapterPackage.kt:10:48 'class TurboReactPackage : BaseReactPackage' is deprecated. Use BaseReactPackage instead.
+w: file:///home/expo/workingdir/build/node_modules/@solana-mobile/mobile-wallet-adapter-protocol/android/src/main/java/com/solanamobile/mobilewalletadapter/reactnative/SolanaMobileWalletAdapterPackage.kt:23:21 'constructor(name: String, className: String, canOverrideExistingModule: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+> Task :react-native-async-storage_async-storage:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: /home/expo/workingdir/build/node_modules/@react-native-async-storage/async-storage/android/src/javaPackage/java/com/reactnativecommunity/asyncstorage/AsyncStoragePackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+> Task :react-native-safe-area-context:javaPreCompileRelease
+> Task :react-native-community_netinfo:compileReleaseJavaWithJavac
+/home/expo/workingdir/build/node_modules/@react-native-community/netinfo/android/src/main/java/com/reactnativecommunity/netinfo/NetInfoModule.java:47: warning: [removal] onCatalystInstanceDestroy() in NativeModule has been deprecated and marked for removal
+    public void onCatalystInstanceDestroy() {
+                ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+1 warning
+> Task :solana-mobile_mobile-wallet-adapter-protocol:javaPreCompileRelease
+> Task :sentry_react-native:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+> Task :react-native-community_netinfo:bundleLibRuntimeToDirRelease
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToDirRelease
+> Task :sentry_react-native:bundleLibRuntimeToDirRelease
+> Task :react-native-safe-area-context:compileReleaseJavaWithJavac
+> Task :react-native-safe-area-context:bundleLibRuntimeToDirRelease
+> Task :solana-mobile_mobile-wallet-adapter-protocol:compileReleaseJavaWithJavac
+> Task :solana-mobile_mobile-wallet-adapter-protocol:bundleLibRuntimeToDirRelease
+> Task :expo:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-constants:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :expo-constants:generateReleaseBuildConfig
+> Task :react-native-maps:generateReleaseBuildConfig
+> Task :expo:generateReleaseBuildConfig
+> Task :expo-constants:generateReleaseResValues
+> Task :expo:generateReleaseResValues
+> Task :react-native-maps:generateReleaseResValues
+> Task :react-native-maps:generateReleaseResources
+> Task :expo-constants:generateReleaseResources
+> Task :expo:generateReleaseResources
+> Task :expo-constants:packageReleaseResources
+> Task :expo:packageReleaseResources
+> Task :react-native-maps:packageReleaseResources
+> Task :expo-constants:parseReleaseLocalResources
+> Task :expo-constants:generateReleaseRFile
+> Task :expo:parseReleaseLocalResources
+> Task :expo:javaPreCompileRelease
+> Task :expo-constants:javaPreCompileRelease
+> Task :react-native-maps:javaPreCompileRelease
+> Task :expo-constants:writeReleaseAarMetadata
+> Task :expo:writeReleaseAarMetadata
+> Task :react-native-community_netinfo:writeReleaseAarMetadata
+> Task :react-native-gesture-handler:writeReleaseAarMetadata
+> Task :react-native-maps:writeReleaseAarMetadata
+> Task :react-native-maps:parseReleaseLocalResources
+> Task :react-native-reanimated:writeReleaseAarMetadata
+> Task :react-native-async-storage_async-storage:writeReleaseAarMetadata
+> Task :expo:generateReleaseRFile
+> Task :solana-mobile_mobile-wallet-adapter-protocol:writeReleaseAarMetadata
+> Task :expo:extractDeepLinksRelease
+> Task :sentry_react-native:writeReleaseAarMetadata
+> Task :expo-constants:extractDeepLinksRelease
+> Task :expo-constants:processReleaseManifest
+> Task :react-native-async-storage_async-storage:extractDeepLinksRelease
+> Task :react-native-safe-area-context:writeReleaseAarMetadata
+> Task :expo:processReleaseManifest
+> Task :react-native-community_netinfo:extractDeepLinksRelease
+> Task :react-native-gesture-handler:extractDeepLinksRelease
+> Task :react-native-async-storage_async-storage:processReleaseManifest
+package="com.reactnativecommunity.asyncstorage" found in source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@react-native-async-storage/async-storage/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.asyncstorage" from the source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@react-native-async-storage/async-storage/android/src/main/AndroidManifest.xml.
+> Task :react-native-maps:extractDeepLinksRelease
+> Task :react-native-maps:generateReleaseRFile
+> Task :react-native-gesture-handler:processReleaseManifest
+> Task :react-native-reanimated:extractDeepLinksRelease
+> Task :react-native-community_netinfo:processReleaseManifest
+package="com.reactnativecommunity.netinfo" found in source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@react-native-community/netinfo/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.netinfo" from the source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@react-native-community/netinfo/android/src/main/AndroidManifest.xml.
+> Task :react-native-maps:processReleaseManifest
+> Task :react-native-safe-area-context:extractDeepLinksRelease
+> Task :sentry_react-native:extractDeepLinksRelease
+> Task :react-native-reanimated:processReleaseManifest
+> Task :react-native-safe-area-context:processReleaseManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/react-native-safe-area-context/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/react-native-safe-area-context/android/src/main/AndroidManifest.xml.
+> Task :solana-mobile_mobile-wallet-adapter-protocol:extractDeepLinksRelease
+> Task :sentry_react-native:processReleaseManifest
+package="io.sentry.react" found in source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@sentry/react-native/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="io.sentry.react" from the source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@sentry/react-native/android/src/main/AndroidManifest.xml.
+> Task :solana-mobile_mobile-wallet-adapter-protocol:processReleaseManifest
+package="com.solanamobile.mobilewalletadapter.reactnative" found in source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@solana-mobile/mobile-wallet-adapter-protocol/android/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.solanamobile.mobilewalletadapter.reactnative" from the source AndroidManifest.xml: /home/expo/workingdir/build/node_modules/@solana-mobile/mobile-wallet-adapter-protocol/android/src/main/AndroidManifest.xml.
+> Task :app:checkReleaseDuplicateClasses
+> Task :app:buildKotlinToolingMetadata
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:generateReleaseBuildConfig
+> Task :expo-constants:compileReleaseLibraryResources
+> Task :expo:compileReleaseLibraryResources
+> Task :react-native-async-storage_async-storage:compileReleaseLibraryResources
+> Task :react-native-community_netinfo:compileReleaseLibraryResources
+> Task :react-native-gesture-handler:compileReleaseLibraryResources
+> Task :sentry_react-native:compileReleaseLibraryResources
+> Task :react-native-reanimated:compileReleaseLibraryResources
+> Task :react-native-safe-area-context:compileReleaseLibraryResources
+> Task :solana-mobile_mobile-wallet-adapter-protocol:compileReleaseLibraryResources
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarRelease
+> Task :react-native-community_netinfo:bundleLibCompileToJarRelease
+> Task :react-native-safe-area-context:bundleLibCompileToJarRelease
+> Task :expo:prepareReleaseArtProfile
+> Task :expo-constants:prepareReleaseArtProfile
+> Task :solana-mobile_mobile-wallet-adapter-protocol:bundleLibCompileToJarRelease
+> Task :react-native-async-storage_async-storage:prepareReleaseArtProfile
+> Task :sentry_react-native:bundleLibCompileToJarRelease
+> Task :react-native-gesture-handler:prepareReleaseArtProfile
+> Task :react-native-community_netinfo:prepareReleaseArtProfile
+> Task :react-native-safe-area-context:prepareReleaseArtProfile
+> Task :react-native-reanimated:prepareReleaseArtProfile
+> Task :sentry_react-native:prepareReleaseArtProfile
+> Task :solana-mobile_mobile-wallet-adapter-protocol:prepareReleaseArtProfile
+> Task :solana-mobile_mobile-wallet-adapter-protocol:bundleLibRuntimeToJarRelease
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarRelease
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarRelease
+> Task :react-native-screens:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-worklets:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-community_netinfo:bundleLibRuntimeToJarRelease
+> Task :sentry_react-native:bundleLibRuntimeToJarRelease
+> Task :expo:mergeReleaseShaders
+> Task :expo:compileReleaseShaders NO-SOURCE
+> Task :expo:generateReleaseAssets UP-TO-DATE
+> Task :expo:mergeReleaseAssets
+> Task :expo-constants:mergeReleaseShaders
+> Task :expo-constants:compileReleaseShaders NO-SOURCE
+> Task :expo-constants:generateReleaseAssets UP-TO-DATE
+> Task :expo-constants:mergeReleaseAssets
+> Task :react-native-async-storage_async-storage:mergeReleaseShaders
+> Task :react-native-async-storage_async-storage:compileReleaseShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateReleaseAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseAssets
+> Task :react-native-community_netinfo:mergeReleaseShaders
+> Task :react-native-community_netinfo:compileReleaseShaders NO-SOURCE
+> Task :react-native-community_netinfo:generateReleaseAssets UP-TO-DATE
+> Task :react-native-community_netinfo:mergeReleaseAssets
+> Task :react-native-gesture-handler:mergeReleaseShaders
+> Task :react-native-gesture-handler:compileReleaseShaders NO-SOURCE
+> Task :react-native-gesture-handler:generateReleaseAssets UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseAssets
+> Task :react-native-reanimated:mergeReleaseShaders
+> Task :react-native-reanimated:compileReleaseShaders NO-SOURCE
+> Task :react-native-reanimated:generateReleaseAssets UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseAssets
+> Task :react-native-safe-area-context:mergeReleaseShaders
+> Task :react-native-safe-area-context:compileReleaseShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateReleaseAssets UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseAssets
+> Task :sentry_react-native:mergeReleaseShaders
+> Task :sentry_react-native:compileReleaseShaders NO-SOURCE
+> Task :sentry_react-native:generateReleaseAssets
+UP-TO-DATE
+> Task :sentry_react-native:mergeReleaseAssets
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseShaders
+> Task :solana-mobile_mobile-wallet-adapter-protocol:compileReleaseShaders NO-SOURCE
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseAssets UP-TO-DATE
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseAssets
+> Task :expo:extractProguardFiles
+> Task :expo-constants:extractProguardFiles
+> Task :expo-constants:prepareLintJarForPublish
+> Task :react-native-async-storage_async-storage:processReleaseJavaRes NO-SOURCE
+> Task :expo:prepareLintJarForPublish
+> Task :react-native-async-storage_async-storage:createFullJarRelease
+> Task :react-native-community_netinfo:processReleaseJavaRes NO-SOURCE
+> Task :react-native-community_netinfo:createFullJarRelease
+> Task :react-native-async-storage_async-storage:extractProguardFiles
+> Task :react-native-community_netinfo:extractProguardFiles
+> Task :react-native-gesture-handler:extractProguardFiles
+> Task :react-native-reanimated:processReleaseJavaRes NO-SOURCE
+> Task :react-native-reanimated:extractProguardFiles
+> Task :react-native-reanimated:prepareLintJarForPublish
+> Task :react-native-gesture-handler:prepareLintJarForPublish
+> Task :react-native-safe-area-context:processReleaseJavaRes
+> Task :react-native-safe-area-context:createFullJarRelease
+> Task :react-native-safe-area-context:extractProguardFiles
+> Task :app:createBundleReleaseJsAndAssets
+React Compiler enabled
+Starting Metro Bundler
+> Task :react-native-worklets:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-maps:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+> Task :react-native-maps:bundleLibRuntimeToDirRelease
+> Task :react-native-worklets:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-maps:compileReleaseLibraryResources
+> Task :react-native-maps:bundleLibCompileToJarRelease
+> Task :react-native-maps:prepareReleaseArtProfile
+> Task :react-native-maps:bundleLibRuntimeToJarRelease
+> Task :react-native-worklets:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-worklets:generateJsonModelRelease
+> Task :react-native-worklets:prefabReleaseConfigurePackage
+> Task :app:createBundleReleaseJsAndAssets
+Android node_modules/expo-router/entry.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+> Task :react-native-community_netinfo:generateReleaseLintModel
+> Task :react-native-safe-area-context:generateReleaseLintModel
+> Task :react-native-async-storage_async-storage:generateReleaseLintModel
+> Task :react-native-async-storage_async-storage:prepareLintJarForPublish
+> Task :react-native-maps:mergeReleaseShaders
+> Task :react-native-community_netinfo:prepareLintJarForPublish
+> Task :react-native-maps:compileReleaseShaders NO-SOURCE
+> Task :react-native-maps:generateReleaseAssets UP-TO-DATE
+> Task :react-native-safe-area-context:prepareLintJarForPublish
+> Task :sentry_react-native:processReleaseJavaRes NO-SOURCE
+> Task :react-native-maps:mergeReleaseAssets
+> Task :react-native-maps:processReleaseJavaRes NO-SOURCE
+> Task :sentry_react-native:createFullJarRelease
+> Task :react-native-maps:createFullJarRelease
+> Task :sentry_react-native:extractProguardFiles
+> Task :react-native-maps:extractProguardFiles
+> Task :solana-mobile_mobile-wallet-adapter-protocol:processReleaseJavaRes
+> Task :solana-mobile_mobile-wallet-adapter-protocol:createFullJarRelease
+> Task :solana-mobile_mobile-wallet-adapter-protocol:extractProguardFiles
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseLintModel
+> Task :solana-mobile_mobile-wallet-adapter-protocol:prepareLintJarForPublish
+> Task :react-native-gesture-handler:extractDeepLinksForAarRelease
+> Task :react-native-safe-area-context:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-safe-area-context:extractDeepLinksForAarRelease
+> Task :react-native-maps:generateReleaseLintModel
+> Task :app:createBundleReleaseJsAndAssets
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓░░░░░░░░░ 47.9% ( 832/1362)
+> Task :react-native-screens:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-maps:prepareLintJarForPublish
+> Task :solana-mobile_mobile-wallet-adapter-protocol:stripReleaseDebugSymbols NO-SOURCE
+> Task :sentry_react-native:generateReleaseLintModel
+> Task :sentry_react-native:prepareLintJarForPublish
+> Task :solana-mobile_mobile-wallet-adapter-protocol:extractDeepLinksForAarRelease
+> Task :solana-mobile_mobile-wallet-adapter-protocol:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-async-storage_async-storage:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-async-storage_async-storage:extractDeepLinksForAarRelease
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-screens:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:createBundleReleaseJsAndAssets
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 93.1% (1824/1890)
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-reanimated:generateJsonModelRelease
+> Task :react-native-reanimated:prefabReleaseConfigurePackage
+> Task :app:createBundleReleaseJsAndAssets
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (2087/2087)
+Android Bundled 12449ms node_modules/expo-router/entry.js (2087 modules)
+Android node_modules/expo-router/entry.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░ 99.9% (2087/2087)
+Writing bundle output to: /home/expo/workingdir/build/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle
+Writing sourcemap output to: /home/expo/workingdir/build/android/app/build/intermediates/sourcemaps/react/release/index.android.bundle.packager.map
+Copying 48 asset files
+Done writing bundle output
+Done writing sourcemap output
+> Task :react-native-gesture-handler:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-gesture-handler:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :solana-mobile_mobile-wallet-adapter-protocol:extractReleaseAnnotations
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseGeneratedProguardFiles
+> Task :react-native-safe-area-context:extractReleaseAnnotations
+> Task :react-native-async-storage_async-storage:extractReleaseAnnotations
+> Task :react-native-safe-area-context:mergeReleaseGeneratedProguardFiles
+> Task :react-native-async-storage_async-storage:mergeReleaseGeneratedProguardFiles
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseConsumerProguardFiles
+> Task :react-native-safe-area-context:mergeReleaseConsumerProguardFiles
+> Task :react-native-async-storage_async-storage:mergeReleaseConsumerProguardFiles
+> Task :react-native-async-storage_async-storage:mergeReleaseJavaResource
+> Task :react-native-safe-area-context:mergeReleaseJavaResource
+> Task :solana-mobile_mobile-wallet-adapter-protocol:mergeReleaseJavaResource
+> Task :solana-mobile_mobile-wallet-adapter-protocol:syncReleaseLibJars
+> Task :react-native-async-storage_async-storage:syncReleaseLibJars
+> Task :solana-mobile_mobile-wallet-adapter-protocol:bundleReleaseLocalLintAar
+> Task :react-native-async-storage_async-storage:bundleReleaseLocalLintAar
+> Task :react-native-safe-area-context:syncReleaseLibJars
+> Task :react-native-safe-area-context:bundleReleaseLocalLintAar
+> Task :react-native-community_netinfo:stripReleaseDebugSymbols NO-SOURCE
+> Task :sentry_react-native:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-community_netinfo:extractDeepLinksForAarRelease
+> Task :react-native-community_netinfo:copyReleaseJniLibsProjectAndLocalJars
+> Task :sentry_react-native:copyReleaseJniLibsProjectAndLocalJars
+> Task :expo:stripReleaseDebugSymbols NO-SOURCE
+> Task :sentry_react-native:extractDeepLinksForAarRelease
+> Task :expo:copyReleaseJniLibsProjectAndLocalJars
+> Task :expo:extractDeepLinksForAarRelease
+> Task :react-native-community_netinfo:extractReleaseAnnotations
+> Task :react-native-maps:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-community_netinfo:mergeReleaseGeneratedProguardFiles
+> Task :react-native-maps:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-maps:extractDeepLinksForAarRelease
+> Task :sentry_react-native:extractReleaseAnnotations
+> Task :react-native-community_netinfo:mergeReleaseConsumerProguardFiles
+> Task :sentry_react-native:mergeReleaseGeneratedProguardFiles
+> Task :sentry_react-native:mergeReleaseConsumerProguardFiles
+> Task :react-native-maps:extractReleaseAnnotations
+> Task :react-native-maps:mergeReleaseGeneratedProguardFiles
+> Task :sentry_react-native:mergeReleaseJavaResource
+> Task :react-native-community_netinfo:mergeReleaseJavaResource
+> Task :react-native-maps:mergeReleaseConsumerProguardFiles
+> Task :react-native-maps:mergeReleaseJavaResource
+> Task :react-native-community_netinfo:syncReleaseLibJars
+> Task :sentry_react-native:syncReleaseLibJars
+> Task :react-native-community_netinfo:bundleReleaseLocalLintAar
+> Task :sentry_react-native:bundleReleaseLocalLintAar
+> Task :react-native-maps:syncReleaseLibJars
+> Task :expo-constants:stripReleaseDebugSymbols NO-SOURCE
+> Task :expo-constants:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-reanimated:extractDeepLinksForAarRelease
+> Task :expo-constants:extractDeepLinksForAarRelease
+> Task :react-native-maps:bundleReleaseLocalLintAar
+> Task :expo-constants:writeReleaseLintModelMetadata
+> Task :react-native-reanimated:mergeReleaseJavaResource
+> Task :expo:writeReleaseLintModelMetadata
+> Task :react-native-reanimated:writeReleaseLintModelMetadata
+> Task :react-native-gesture-handler:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-screens:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-gesture-handler:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-async-storage_async-storage:writeReleaseLintModelMetadata
+> Task :react-native-community_netinfo:writeReleaseLintModelMetadata
+> Task :react-native-gesture-handler:writeReleaseLintModelMetadata
+> Task :react-native-maps:writeReleaseLintModelMetadata
+> Task :expo-modules-core:buildCMakeRelWithDebInfo[arm64-v8a]
+> Task :react-native-screens:configureCMakeRelWithDebInfo[x86]
+> Task :expo-modules-core:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-community_netinfo:lintVitalAnalyzeRelease
+> Task :react-native-safe-area-context:writeReleaseLintModelMetadata
+> Task :react-native-screens:buildCMakeRelWithDebInfo[x86]
+> Task :react-native-worklets:buildCMakeRelWithDebInfo[arm64-v8a][worklets]
+> Task :react-native-maps:lintVitalAnalyzeRelease
+> Task :sentry_react-native:writeReleaseLintModelMetadata
+> Task :sentry_react-native:lintVitalAnalyzeRelease
+> Task :solana-mobile_mobile-wallet-adapter-protocol:writeReleaseLintModelMetadata
+> Task :react-native-async-storage_async-storage:generateReleaseLintVitalModel
+> Task :react-native-community_netinfo:generateReleaseLintVitalModel
+> Task :react-native-maps:generateReleaseLintVitalModel
+> Task :react-native-safe-area-context:generateReleaseLintVitalModel
+> Task :sentry_react-native:generateReleaseLintVitalModel
+> Task :solana-mobile_mobile-wallet-adapter-protocol:generateReleaseLintVitalModel
+> Task :react-native-screens:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-async-storage_async-storage:lintVitalAnalyzeRelease
+> Task :react-native-screens:buildCMakeRelWithDebInfo[x86_64]
+> Task :react-native-screens:mergeReleaseJniLibFolders
+> Task :react-native-screens:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :react-native-screens:generateReleaseBuildConfig
+> Task :react-native-screens:generateReleaseResValues
+> Task :react-native-screens:generateReleaseResources
+> Task :react-native-screens:mergeReleaseNativeLibs
+> Task :solana-mobile_mobile-wallet-adapter-protocol:lintVitalAnalyzeRelease
+> Task :react-native-screens:packageReleaseResources
+> Task :react-native-screens:javaPreCompileRelease
+> Task :react-native-screens:writeReleaseAarMetadata
+> Task :react-native-screens:extractDeepLinksRelease
+> Task :react-native-screens:parseReleaseLocalResources
+> Task :react-native-screens:copyReleaseJniLibsProjectOnly
+> Task :react-native-screens:processReleaseManifest
+> Task :react-native-screens:prepareReleaseArtProfile
+> Task :react-native-screens:mergeReleaseShaders
+> Task :react-native-screens:compileReleaseShaders NO-SOURCE
+> Task :react-native-screens:generateReleaseAssets UP-TO-DATE
+> Task :react-native-screens:generateReleaseRFile
+> Task :react-native-screens:mergeReleaseAssets
+> Task :react-native-screens:compileReleaseLibraryResources
+> Task :react-native-screens:extractProguardFiles
+> Task :react-native-screens:prepareLintJarForPublish
+> Task :react-native-screens:extractDeepLinksForAarRelease
+> Task :react-native-screens:writeReleaseLintModelMetadata
+> Task :react-native-screens:stripReleaseDebugSymbols
+> Task :react-native-screens:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-safe-area-context:lintVitalAnalyzeRelease
+> Task :expo-modules-core:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :expo-modules-core:configureCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[arm64-v8a]
+> Task :app:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :app:configureCMakeRelWithDebInfo[x86]
+> Task :app:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-worklets:buildCMakeRelWithDebInfo[armeabi-v7a][worklets]
+> Task :app:createBundleReleaseJsAndAssets_SentryUpload_com.hfire.admin@1.0.0+1_1
+Copy `debugId` from packager source map to Hermes source map...
+Done.
+Check generated source map for Debug ID: b0e6a9e0-2307-4aa0-ac07-260f397c3438
+Sentry Source Maps upload will include the release name and dist.
+Sentry-CLI arguments: [/home/expo/workingdir/build/node_modules/@sentry/cli/bin/sentry-cli, react-native, gradle, --bundle, /home/expo/workingdir/build/android/app/build/generated/assets/createBundleReleaseJsAndAssets/index.android.bundle, --sourcemap, /home/expo/workingdir/build/android/app/build/generated/sourcemaps/react/release/index.android.bundle.map, --release, com.hfire.admin@1.0.0+1, --dist, 1]
+Processing react-native sourcemaps for Sentry upload.
+> Analyzing 2 sources
+> Rewriting sources
+INFO    2026-04-12 14:20:05.941978251 +00:00 Loaded file referenced by SENTRY_PROPERTIES (/home/expo/workingdir/build/android/sentry.properties)
+> Adding source map references
+Uploading sourcemaps for release com.hfire.admin@1.0.0+1 distribution 1
+error: Project not found. Ensure that you configured the correct project and organization.
+Add --log-level=[info|debug] or export SENTRY_LOG_LEVEL=[info|debug] to see more output.
+Please attach the full debug log to all bug reports.
+> Task :app:createBundleReleaseJsAndAssets_SentryUpload_com.hfire.admin@1.0.0+1_1 FAILED
+> Task :app:createBundleReleaseJsAndAssets_SentryUploadCleanUp SKIPPED
+> Task :react-native-screens:compileReleaseKotlin
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:56:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'name'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:57:9 The corresponding parameter in the supertype 'BaseReactPackage' is named 'reactContext'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/RNScreensPackage.kt:70:17 'constructor(name: String, className: String, canOverrideExistingModule: Boolean, needsEagerInit: Boolean, hasConstants: Boolean, isCxxModule: Boolean, isTurboModule: Boolean): ReactModuleInfo' is deprecated. This constructor is deprecated and will be removed in the future. Use ReactModuleInfo(String, String, boolean, boolean, boolean, boolean)].
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:48:77 Unchecked cast of '(CoordinatorLayout.Behavior<View!>?..CoordinatorLayout.Behavior<*>?)' to 'BottomSheetBehavior<Screen>'.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:383:36 'fun setTranslucent(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:402:36 'fun setColor(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:420:36 'fun setNavigationBarColor(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/Screen.kt:437:36 'fun setNavigationBarTranslucent(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:217:31 'var targetElevation: Float' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:220:13 'fun setHasOptionsMenu(p0: Boolean): Unit' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:397:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:404:22 'fun onPrepareOptionsMenu(p0: Menu): Unit' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:407:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackFragment.kt:412:22 'fun onCreateOptionsMenu(p0: Menu, p1: MenuInflater): Unit' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenStackHeaderConfig.kt:435:18 'val reactNativeHost: ReactNativeHost' is deprecated. You should not use ReactNativeHost directly in the New Architecture. Use ReactHost instead.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:203:14 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:220:14 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:237:14 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenViewManager.kt:246:14 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:55:42 'fun replaceSystemWindowInsets(p0: Int, p1: Int, p2: Int, p3: Int): WindowInsetsCompat' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:56:39 'val systemWindowInsetLeft: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:58:39 'val systemWindowInsetRight: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:59:39 'val systemWindowInsetBottom: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:102:53 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:106:37 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:113:48 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:116:32 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:162:49 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218:43 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:218:72 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:224:16 'var navigationBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:241:55 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:283:13 'fun setColor(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:285:13 'fun setTranslucent(screen: Screen, activity: Activity?, context: ReactContext?): Unit' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:289:13 'fun setNavigationBarColor(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:290:13 'fun setNavigationBarTranslucent(screen: Screen, activity: Activity?): Unit' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:354:42 'var statusBarColor: Int?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:356:48 'var isStatusBarTranslucent: Boolean?' is deprecated. For apps targeting SDK 35 or above this prop has no effect because edge-to-edge is enabled by default and the status bar is always translucent.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:359:57 'var navigationBarColor: Int?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/ScreenWindowTraits.kt:360:63 'var isNavigationBarTranslucent: Boolean?' is deprecated. For all apps targeting Android SDK 35 or above edge-to-edge is enabled by default.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:7:8 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:25:13 'object ReactFeatureFlags : Any' is deprecated. Use com.facebook.react.internal.featureflags.ReactNativeFeatureFlags instead.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:32:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'left'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:33:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'top'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:34:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'right'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:35:9 The corresponding parameter in the supertype 'ReactViewGroup' is named 'bottom'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:71:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:72:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:79:46 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:83:9 The corresponding parameter in the supertype 'RootView' is named 'childView'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:84:9 The corresponding parameter in the supertype 'RootView' is named 'ev'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/BottomSheetDialogRootView.kt:95:34 The corresponding parameter in the supertype 'RootView' is named 't'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:63:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:64:9 The corresponding parameter in the supertype 'ReactCompoundView' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:68:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchX'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/bottomsheet/DimmingView.kt:69:9 The corresponding parameter in the supertype 'ReactCompoundViewGroup' is named 'touchY'. This may cause problems when calling this function with named arguments.
+w: file:///home/expo/workingdir/build/node_modules/react-native-screens/android/src/main/java/com/swmansion/rnscreens/gamma/tabs/TabsHostViewManager.kt:37:9 The corresponding parameter in the supertype 'TabsHostViewManager' is named 'view'. This may cause problems when calling this function with named arguments.
+> Task :expo-modules-core:buildCMakeRelWithDebInfo[x86]
+> Task :react-native-worklets:buildCMakeRelWithDebInfo[x86][worklets]
+[Incubating] Problems report is available at: file:///home/expo/workingdir/build/android/build/reports/problems/problems-report.html
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+For more on this, please refer to https://docs.gradle.org/8.14.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+410 actionable tasks: 410 executed
+FAILURE: Build failed with an exception.
+* Where:
+Script '/home/expo/workingdir/build/node_modules/@sentry/react-native/sentry.gradle' line: 149
+* What went wrong:
+Execution failed for task ':app:createBundleReleaseJsAndAssets_SentryUpload_com.hfire.admin@1.0.0+1_1'.
+> Process 'command '/home/expo/workingdir/build/node_modules/@sentry/cli/bin/sentry-cli'' finished with non-zero exit value 1
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+BUILD FAILED in 3m 10s
+Error: Gradle build failed with unknown error. See logs for the "Run gradlew" phase for more information.

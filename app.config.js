@@ -6,7 +6,7 @@ export default {
     "slug": "h-fire-admin",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/h-fire_logo.png",
     "scheme": "hfire-admin",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -21,7 +21,7 @@ export default {
       "package": "com.hfire.admin",
       "adaptiveIcon": {
         "backgroundColor": "#1A0000",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "foregroundImage": "./assets/images/h-fire_logo.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
@@ -42,14 +42,15 @@ export default {
       "expo-web-browser",
       "expo-secure-store",
       "expo-notifications",
-      [
+      // Only include Sentry in production or when explicitly configured
+      ...(process.env.EAS_BUILD_PROFILE === 'production' ? [[
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
           "project": "h-fire-admin",
           "organization": "rhein-tigle"
         }
-      ],
+      ]] : []),
       [
         "expo-splash-screen",
         {
@@ -65,7 +66,7 @@ export default {
     ],
     "extra": {
       "eas": {
-        "projectId": "d0403495-fd03-4057-89f9-e79b3fb22190"
+        "projectId": "69a01d75-3f54-41f8-b8a9-79eb726079f4"
       }
     },
     "experiments": {

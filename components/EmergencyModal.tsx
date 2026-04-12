@@ -25,7 +25,7 @@ interface EmergencyModalProps {
 }
 
 export default function EmergencyModal({ visible, incident, onClose, isAdmin }: EmergencyModalProps) {
-  const { role } = useAdminAuth ? useAdminAuth() : { role: null };
+  const { role } = useAdminAuth();
   const { allDevices } = useAdmin();
   const [pulseAnim] = useState(new Animated.Value(1));
   const [sound, setSound] = useState<Audio.Sound | null>(null);

@@ -218,7 +218,7 @@ export default function LoginScreen() {
 
         <TouchableOpacity style={styles.signupLink} onPress={() => router.push('/signup')}>
           <Text style={[styles.signupText, { color: isDark ? '#888' : '#666' }]}>
-            Don't have an account? <Text style={{ color: ACCENT, fontWeight: '900' }}>Sign Up</Text>
+            Don&apos;t have an account? <Text style={{ color: ACCENT, fontWeight: '900' }}>Sign Up</Text>
           </Text>
         </TouchableOpacity>
       </Animated.View>

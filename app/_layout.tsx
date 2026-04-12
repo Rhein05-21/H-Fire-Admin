@@ -22,7 +22,9 @@ global.Buffer = global.Buffer || Buffer;
 
 // Initialize Sentry
 Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  dsn: "https://1a585904c3413d59f72cbcfc4dc6f005@o4511182597521408.ingest.de.sentry.io/4511205901860944",
+  // Enable logs to be sent to Sentry
+  enableLogs: true,
   debug: false, // Set to true to see Sentry debug logs
 });
 
@@ -57,6 +59,25 @@ function RootLayoutContent() {
   const { colorScheme } = useAppTheme();
   const { activeIncident, triggerEmergency, dismissEmergency } = useAdmin();
   const { isAuthenticated, user } = useAdminAuth();
+
+  // Test Sentry logs
+  useEffect(() => {
+    // Send different log levels
+    Sentry.logger.info('This is an info log');
+
+    Sentry.logger.warn('This is a warning log', {
+      log_type: 'test',
+    });
+
+    Sentry.logger.error('This is an error log');
+
+    // Using formatted messages with dynamic values
+    const testUser = 'john_doe';
+    const action = 'login';
+    Sentry.logger.info(
+      Sentry.logger.fmt`User '${testUser}' performed '${action}'`
+    );
+  }, []);
 
   // --- PUSH NOTIFICATION SETUP (SAFE VERSION) ---
   useEffect(() => {
