@@ -34,9 +34,9 @@
       [
         "@sentry/react-native/expo",
         {
-          "url": "https://sentry.io/",
+          "url": "https://de.sentry.io/",
           "project": "h-fire-admin",
-          "organization": "rhein-tigle"
+          "organization": "h-fire"
         }
       ],
       [

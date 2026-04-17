@@ -5,6 +5,12 @@ export default {
     "name": "H-Fire: Admin Monitoring Center",
     "slug": "h-fire-admin",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/99118b16-0602-40b2-a3ca-d208715010a1"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/h-fire_logo.png",
     "scheme": "hfire-admin",
@@ -42,15 +48,14 @@ export default {
       "expo-web-browser",
       "expo-secure-store",
       "expo-notifications",
-      // Only include Sentry in production or when explicitly configured
-      ...(process.env.EAS_BUILD_PROFILE === 'production' ? [[
+      [
         "@sentry/react-native/expo",
         {
           "url": "https://sentry.io/",
           "project": "h-fire-admin",
-          "organization": "rhein-tigle"
+          "organization": "h-fire"
         }
-      ]] : []),
+      ],
       [
         "expo-splash-screen",
         {
@@ -66,7 +71,7 @@ export default {
     ],
     "extra": {
       "eas": {
-        "projectId": "69a01d75-3f54-41f8-b8a9-79eb726079f4"
+        "projectId": "99118b16-0602-40b2-a3ca-d208715010a1"
       }
     },
     "experiments": {
