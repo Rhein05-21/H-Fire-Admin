@@ -9,7 +9,7 @@ import { getStatusColor } from '@/constants/thresholds';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAppTheme } from '@/context/ThemeContext';
-import { useUser, Device } from '@/context/UserContext';
+import { useAdmin, Device } from '@/context/AdminContext';
 
 const { width } = Dimensions.get('window');
 
@@ -22,7 +22,7 @@ const getStatusData = (ppm: number, isInactive: boolean) => {
 
 export default function GasDashboard() {
   const { colorScheme } = useAppTheme();
-  const { userDetails, profileId, loading: userLoading, devices, setUserDetails } = useUser();
+  const { allDevices: devices } = useAdmin();
   
   const containerBg = useThemeColor({}, 'background');
   const cardBg = useThemeColor({ light: '#fff', dark: '#1c1c1e' }, 'background');
@@ -35,15 +35,6 @@ export default function GasDashboard() {
   const [editingMac, setEditingMac] = useState<string | null>(null);
   const [tempLabel, setTempLabel] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [setupName, setSetupName] = useState('');
-  const [setupCommunity, setSetupCommunity] = useState('');
-
-  useEffect(() => {
-    if (!userLoading && !userDetails) setShowOnboarding(true);
-    else setShowOnboarding(false);
-  }, [userDetails, userLoading]);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => setInternetConnected(state.isConnected));
@@ -132,7 +123,7 @@ export default function GasDashboard() {
       <View style={styles.heroHeader}>
         <View>
           <Text style={styles.brandText}>H-FIRE MONITOR</Text>
-          <Text style={[styles.welcomeText, { color: textColor }]}>Welcome, {userDetails?.name?.split(' ')[0] || 'Homeowner'}</Text>
+          <Text style={[styles.welcomeText, { color: textColor }]}>Welcome, Admin</Text>
         </View>
         <View style={[styles.connBadge, { backgroundColor: internetConnected ? '#34C75920' : '#FF3B3020' }]}>
           <View style={[styles.dot, { backgroundColor: internetConnected ? '#34C759' : '#FF3B30' }]} />

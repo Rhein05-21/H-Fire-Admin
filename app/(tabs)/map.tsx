@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker, Callout } from '@/components/CommunityMap';
 import { supabase } from '@/utils/supabase';
 import { useAdmin, Device } from '@/context/AdminContext';
 import { useAppTheme } from '@/context/ThemeContext';
@@ -27,9 +27,16 @@ function getMarkerColor(worstPpm: number, hasDevices: boolean): string {
 export default function AdminMapScreen() {
   const { allDevices } = useAdmin();
   const { colorScheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
   const [profiles, setProfiles] = useState<ProfileLocation[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Tab bar height calculation logic (must match _layout.tsx)
+  const TAB_BAR_CONTENT_HEIGHT = 60;
+  const bottomPadding = Math.max(insets.bottom, 15);
+  const totalTabBarHeight = TAB_BAR_CONTENT_HEIGHT + bottomPadding;
+  const floatingBottom = totalTabBarHeight + 16;
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -138,7 +145,11 @@ export default function AdminMapScreen() {
       </MapView>
 
       {/* Legend */}
-      <View style={[styles.legend, { backgroundColor: isDark ? 'rgba(10,10,10,0.85)' : 'rgba(255,255,255,0.9)' }]}>
+      <View style={[
+        styles.legend, 
+        { bottom: floatingBottom },
+        { backgroundColor: isDark ? 'rgba(10,10,10,0.85)' : 'rgba(255,255,255,0.9)' }
+      ]}>
         <View style={styles.legendRow}>
           <View style={[styles.legendDot, { backgroundColor: ACCENT }]} />
           <Text style={[styles.legendText, { color: isDark ? '#ccc' : '#444' }]}>FIRE ({'>'}1500 PPM)</Text>
@@ -154,7 +165,11 @@ export default function AdminMapScreen() {
       </View>
 
       {validProfiles.length === 0 && (
-        <View style={[styles.noLocations, { backgroundColor: isDark ? 'rgba(10,10,10,0.9)' : 'rgba(255,255,255,0.95)' }]}>
+        <View style={[
+          styles.noLocations, 
+          { bottom: floatingBottom },
+          { backgroundColor: isDark ? 'rgba(10,10,10,0.9)' : 'rgba(255,255,255,0.95)' }
+        ]}>
           <Text style={[styles.noLocationsText, { color: isDark ? '#888' : '#666' }]}>
             ⚠️ No household locations found in database.{'\n'}
             Residents must set their home location in the H-Fire app.

@@ -6,7 +6,7 @@ import { ThemeProvider, useAppTheme } from '@/context/ThemeContext';
 import { supabase } from '@/utils/supabase';
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { Buffer } from 'buffer';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
@@ -17,6 +17,7 @@ import * as SecureStore from 'expo-secure-store';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 global.Buffer = global.Buffer || Buffer;
 
@@ -52,6 +53,26 @@ const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
 if (!publishableKey) {
   throw new Error('Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env');
+}
+
+function ProtectedLayout() {
+  const { isAuthenticated, loading } = useAdminAuth();
+  const router = useRouter();
+  const segments = useSegments();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === 'login' || segments[0] === 'signup' || segments[0] === 'forgot-password';
+
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace('/login');
+    } else if (isAuthenticated && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated, loading, segments]);
+
+  return null;
 }
 
 // MAIN LAYOUT COMPONENT
@@ -158,8 +179,8 @@ function RootLayoutContent() {
 
   return (
     <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <ProtectedLayout />
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
         <Stack.Screen name="login" />
         <Stack.Screen name="signup" />
         <Stack.Screen name="forgot-password" />
@@ -183,15 +204,17 @@ function RootLayout() {
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
-        <ErrorBoundary>
-          <ThemeProvider>
-            <AdminAuthProvider>
-              <AdminProvider>
-                <RootLayoutContent />
-              </AdminProvider>
-            </AdminAuthProvider>
-          </ThemeProvider>
-        </ErrorBoundary>
+        <SafeAreaProvider>
+          <ErrorBoundary>
+            <ThemeProvider>
+              <AdminAuthProvider>
+                <AdminProvider>
+                  <RootLayoutContent />
+                </AdminProvider>
+              </AdminAuthProvider>
+            </ThemeProvider>
+          </ErrorBoundary>
+        </SafeAreaProvider>
       </ClerkLoaded>
     </ClerkProvider>
   );

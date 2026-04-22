@@ -3,6 +3,7 @@ import { useAppTheme } from '@/context/ThemeContext';
 import { useAuth, useOAuth } from '@clerk/clerk-expo';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as Linking from 'expo-linking';
 import { Redirect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as WebBrowser from 'expo-web-browser';
@@ -40,16 +41,16 @@ export default function LoginScreen() {
   const shakeAnim = useRef(new Animated.Value(0)).current;
 
   const { startOAuthFlow: googleAuth } = useOAuth({ strategy: 'oauth_google' });
-  const { startOAuthFlow: facebookAuth } = useOAuth({ strategy: 'oauth_facebook' });
 
-  const onSelectAuth = useCallback(async (strategy: 'google' | 'facebook') => {
-    const selectedAuth = strategy === 'google' ? googleAuth : facebookAuth;
+  const onSelectAuth = useCallback(async () => {
     setLoading(true);
     setError('');
-    console.log(`[OAuth] Starting ${strategy} flow...`);
+    console.log(`[OAuth] Starting google flow...`);
     
     try {
-      const { createdSessionId, setActive } = await selectedAuth();
+      const { createdSessionId, setActive } = await googleAuth({
+        redirectUrl: Linking.createURL('/', { scheme: 'hfire-admin' })
+      });
 
       if (createdSessionId) {
         console.log(`[OAuth] Session created: ${createdSessionId}. Setting active...`);
@@ -67,7 +68,7 @@ export default function LoginScreen() {
     } finally {
       setLoading(false);
     }
-  }, [googleAuth, facebookAuth, signOut]);
+  }, [googleAuth, router]);
 
   if (isAuthenticated) {
     return <Redirect href="/(tabs)" />;
@@ -198,29 +199,12 @@ export default function LoginScreen() {
               backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#fff',
               borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
             }]}
-            onPress={() => onSelectAuth('google')}
+            onPress={() => onSelectAuth()}
           >
             <Ionicons name="logo-google" size={20} color={isDark ? '#fff' : '#000'} />
-            <Text style={[styles.socialBtnText, { color: isDark ? '#fff' : '#000' }]}>Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.socialBtn, { 
-              backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : '#fff',
-              borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-            }]}
-            onPress={() => onSelectAuth('facebook')}
-          >
-            <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-            <Text style={[styles.socialBtnText, { color: isDark ? '#fff' : '#000' }]}>Facebook</Text>
+            <Text style={[styles.socialBtnText, { color: isDark ? '#fff' : '#000' }]}>Continue with Google</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.signupLink} onPress={() => router.push('/signup')}>
-          <Text style={[styles.signupText, { color: isDark ? '#888' : '#666' }]}>
-            Don&apos;t have an account? <Text style={{ color: ACCENT, fontWeight: '900' }}>Sign Up</Text>
-          </Text>
-        </TouchableOpacity>
       </Animated.View>
 
       <View style={styles.hintRow}>

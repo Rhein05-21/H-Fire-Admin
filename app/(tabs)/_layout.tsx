@@ -3,14 +3,22 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAppTheme } from '@/context/ThemeContext';
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ADMIN_TINT = '#E53935'; // Red for admin
 
 export default function AdminTabLayout() {
   const { colorScheme } = useAppTheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
   const backgroundColor = isDark ? '#0f0f0f' : '#ffffff';
   const shadowColor = isDark ? '#000' : '#888';
+
+  // Base height for the tab bar content (icons/labels)
+  const TAB_BAR_CONTENT_HEIGHT = 60;
+  // Use insets.bottom if it exists, otherwise use a default padding
+  const bottomPadding = Math.max(insets.bottom, 15);
+  const totalHeight = TAB_BAR_CONTENT_HEIGHT + bottomPadding;
 
   return (
     <Tabs
@@ -27,9 +35,9 @@ export default function AdminTabLayout() {
           shadowOpacity: isDark ? 0.3 : 0.1,
           shadowRadius: 20,
           shadowOffset: { width: 0, height: -5 },
-          height: 80,
-          paddingBottom: 20,
-          paddingTop: 8,
+          height: totalHeight,
+          paddingBottom: bottomPadding,
+          paddingTop: 12,
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
           position: 'absolute',
@@ -43,16 +51,16 @@ export default function AdminTabLayout() {
         },
       }}>
       <Tabs.Screen
-        name="explore"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
         name="index"
         options={{
           title: 'DASHBOARD',
           tabBarIcon: ({ color }) => <IconSymbol size={22} name="waveform.path.ecg" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen

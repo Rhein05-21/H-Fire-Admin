@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { StyleSheet, View, Text, FlatList, ActivityIndicator, Dimensions, TouchableOpacity, Modal, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from '@/components/CommunityMap';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '@/utils/supabase';
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAppTheme } from '@/context/ThemeContext';
 import { getStatusColor } from '@/constants/thresholds';
-import { useUser } from '@/context/UserContext';
+import { useAdmin } from '@/context/AdminContext';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 const { width, height } = Dimensions.get('window');
@@ -21,7 +21,7 @@ const getStatusData = (ppm: number, isInactive: boolean) => {
 
 export default function AdminDashboard() {
   const { colorScheme } = useAppTheme();
-  const { devices: liveMqttData, triggerEmergency } = useUser();
+  const { allDevices: liveMqttData, triggerEmergency } = useAdmin();
   
   const backgroundColor = useThemeColor({}, 'background');
   const cardBg = useThemeColor({ light: '#fff', dark: '#1c1c1e' }, 'background');
