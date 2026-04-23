@@ -31,9 +31,10 @@ export default function AdminDashboard() {
   const [dbDevices, setDbDevices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Map Modal State
+  // Modal State
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
   const [showMap, setShowMap] = useState(false);
+  const [showAllDevicesModal, setShowAllDevicesModal] = useState(false);
 
   const refreshData = async () => {
     try {
@@ -149,9 +150,21 @@ export default function AdminDashboard() {
           <Text style={styles.headerSub}>ADMIN COMMAND CENTER</Text>
           <Text style={[styles.headerTitle, { color: textColor }]}>Community Feed</Text>
         </View>
-        <View style={styles.statsBadge}>
-          <View style={styles.pulseDot} />
-          <Text style={styles.statsText}>{finalDisplayList.filter(d => !d.isInactive).length} LIVE</Text>
+        <View style={styles.statsContainer}>
+          <TouchableOpacity 
+            style={styles.statsBadge} 
+            onPress={() => setShowAllDevicesModal(true)}
+          >
+            <View style={styles.pulseDot} />
+            <Text style={styles.statsText}>{finalDisplayList.filter(d => !d.isInactive).length} LIVE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.statsBadge, { backgroundColor: 'rgba(33, 150, 243, 0.15)', marginLeft: 8 }]} 
+            onPress={() => setShowAllDevicesModal(true)}
+          >
+            <IconSymbol name="cpu" size={10} color="#2196F3" />
+            <Text style={[styles.statsText, { color: '#2196F3' }]}>{finalDisplayList.length} TOTAL</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -168,6 +181,31 @@ export default function AdminDashboard() {
           showsVerticalScrollIndicator={false}
         />
       )}
+
+      {/* ALL DEVICES LIST MODAL */}
+      <Modal visible={showAllDevicesModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.modalBackBtn} 
+              onPress={() => setShowAllDevicesModal(false)}
+            >
+              <IconSymbol name="chevron.left" size={24} color={textColor} />
+              <Text style={[styles.modalBackText, { color: textColor }]}>Dashboard</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalHeaderTitle, { color: textColor }]}>All Devices</Text>
+            <View style={{ width: 60 }} />
+          </View>
+          
+          <FlatList
+            data={finalDisplayList}
+            keyExtractor={(item) => item.mac}
+            renderItem={renderDeviceItem}
+            contentContainerStyle={styles.modalList}
+            showsVerticalScrollIndicator={false}
+          />
+        </SafeAreaView>
+      </Modal>
 
       {/* TACTICAL MAP MODAL */}
       <Modal visible={showMap} animationType="slide" transparent={false}>
@@ -231,6 +269,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, paddingVertical: 20 },
   headerSub: { color: '#2196F3', fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   headerTitle: { fontSize: 28, fontWeight: '900', marginTop: 2 },
+  statsContainer: { flexDirection: 'row', alignItems: 'center' },
   statsBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(52, 199, 89, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   statsText: { color: '#34C759', fontSize: 10, fontWeight: '900', marginLeft: 6 },
   pulseDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#34C759' },
@@ -253,8 +292,14 @@ const styles = StyleSheet.create({
   
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
-  // Map Modal Styles
-  modalContainer: { flex: 1, backgroundColor: '#000' },
+  // Modal Styles
+  modalContainer: { flex: 1 },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.05)' },
+  modalBackBtn: { flexDirection: 'row', alignItems: 'center' },
+  modalBackText: { fontSize: 16, fontWeight: '700', marginLeft: 5 },
+  modalHeaderTitle: { fontSize: 18, fontWeight: '900' },
+  modalList: { padding: 20 },
+  
   fullMap: { flex: 1 },
   closeMapBtn: { position: 'absolute', top: 60, left: 20, zIndex: 10 },
   closeAction: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 25, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
