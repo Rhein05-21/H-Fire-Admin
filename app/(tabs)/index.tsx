@@ -4,13 +4,19 @@ import { Device, useAdmin } from '@/context/AdminContext';
 import { useAppTheme } from '@/context/ThemeContext';
 import * as Haptics from 'expo-haptics';
 import { StatusBar } from 'expo-status-bar';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Dimensions,
   FlatList,
-  Platform, RefreshControl,
+  Modal,
+  Platform,
+  RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,12 +40,66 @@ interface GroupedHouse {
 }
 
 export default function AdminDashboard() {
-  const { allDevices, mqttConnected } = useAdmin();
+  const { allDevices, allProfiles, mqttConnected } = useAdmin();
   const { role } = useAdminAuth();
   const { colorScheme } = useAppTheme();
   const [refreshing, setRefreshing] = useState(false);
+  const [showAllDevicesModal, setShowAllDevicesModal] = useState(false);
+  const [showAllUsersModal, setShowAllUsersModal] = useState(false);
+  
+  const [logCount, setLogCount] = useState(0);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
+  const [broadcastMessage, setBroadcastMessage] = useState('');
+  const [broadcasting, setBroadcasting] = useState(false);
 
   const isDark = colorScheme === 'dark';
+
+  const fetchActivity = async () => {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const { count } = await supabase
+      .from('gas_logs')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', today.toISOString());
+    setLogCount(count || 0);
+  };
+
+  useEffect(() => {
+    fetchActivity();
+    const interval = setInterval(fetchActivity, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleBroadcast = async () => {
+    if (!broadcastMessage.trim()) return;
+    setBroadcasting(true);
+    try {
+      // Broadcast via Supabase Realtime channel
+      const channel = supabase.channel('global-alerts');
+      await channel.subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.send({
+            type: 'broadcast',
+            event: 'emergency',
+            payload: { 
+              message: broadcastMessage.trim(),
+              sender: 'ADMIN',
+              timestamp: new Date().toISOString()
+            },
+          });
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          Alert.alert('Success', 'Broadcast sent to all active community members.');
+          setBroadcastMessage('');
+          setShowBroadcastModal(false);
+          setBroadcasting(false);
+          supabase.removeChannel(channel);
+        }
+      });
+    } catch (e) {
+      Alert.alert('Error', 'Failed to send broadcast.');
+      setBroadcasting(false);
+    }
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -67,12 +127,12 @@ export default function AdminDashboard() {
 
   // Summary stats
   const totalDevices = Object.keys(allDevices).length;
-  const dangerCount = Object.values(allDevices).filter(d => d.ppm > 1500 || d.flame).length;
-  const warningCount = Object.values(allDevices).filter(d => d.ppm > 450 && d.ppm <= 1500 && !d.flame).length;
-  const offlineCount = Object.values(allDevices).filter(
-    d => !d.lastSeen || Date.now() - new Date(d.lastSeen).getTime() > 60000
-  ).length;
-
+  const userList = useMemo(() => {
+    return Object.values(allProfiles).filter(p => !p.is_admin);
+  }, [allProfiles]);
+  const userCount = userList.length;
+  const communityCount = new Set(groupedHouses.map(h => h.community).filter(Boolean)).size || (groupedHouses.length > 0 ? 1 : 0);
+  
   const renderDeviceRow = (dev: Device) => {
     const isInactive = !dev.lastSeen || Date.now() - new Date(dev.lastSeen).getTime() > 60000;
     const s = getStatusData(dev.ppm, isInactive, dev.flame);
@@ -148,26 +208,37 @@ export default function AdminDashboard() {
 
       {/* Stat Cards */}
       <View style={styles.statsRow}>
-        <View style={[styles.statCard, { borderColor: '#34C75940', backgroundColor: isDark ? '#141414' : '#fff' }]}>
+        <TouchableOpacity 
+          style={[styles.statCard, { borderColor: '#34C75940', backgroundColor: isDark ? '#141414' : '#fff' }]}
+          onPress={() => setShowAllDevicesModal(true)}
+          activeOpacity={0.7}
+          // Smaller hitSlop to avoid overlap
+          hitSlop={{ top: 5, bottom: 5, left: 5, right: 5 }}
+        >
           <IconSymbol name="cpu" size={14} color="#34C759" />
           <Text style={[styles.statNum, { color: '#34C759' }]}>{totalDevices}</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>TOTAL DEVICES</Text>
-        </View>
-        <View style={[styles.statCard, { borderColor: ACCENT + '40', backgroundColor: isDark ? '#141414' : '#fff' }]}>
-          <IconSymbol name="flame.fill" size={14} color={dangerCount > 0 ? ACCENT : '#555'} />
-          <Text style={[styles.statNum, { color: dangerCount > 0 ? ACCENT : (isDark ? '#333' : '#ccc') }]}>{dangerCount}</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>ACTIVE FIRES</Text>
-        </View>
-        <View style={[styles.statCard, { borderColor: '#FF950040', backgroundColor: isDark ? '#141414' : '#fff' }]}>
-          <IconSymbol name="exclamationmark.triangle.fill" size={14} color={warningCount > 0 ? '#FF9500' : '#555'} />
-          <Text style={[styles.statNum, { color: warningCount > 0 ? '#FF9500' : (isDark ? '#333' : '#ccc') }]}>{warningCount}</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>MODERATE RISK</Text>
-        </View>
-        <View style={[styles.statCard, { borderColor: '#55555540', backgroundColor: isDark ? '#141414' : '#fff' }]}>
-          <IconSymbol name="wifi.slash" size={14} color={offlineCount > 0 ? (isDark ? '#888' : '#666') : '#555'} />
-          <Text style={[styles.statNum, { color: offlineCount > 0 ? (isDark ? '#888' : '#666') : (isDark ? '#333' : '#ccc') }]}>{offlineCount}</Text>
-          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>OFFLINE UNITS</Text>
-        </View>
+          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>DEVICES</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.statCard, { borderColor: '#2196F340', backgroundColor: isDark ? '#141414' : '#fff' }]}
+          onPress={() => setShowAllUsersModal(true)}
+          activeOpacity={0.7}
+          hitSlop={{ top: 15, bottom: 15, left: 10, right: 10 }}
+        >
+          <IconSymbol name="person.2.fill" size={14} color="#2196F3" />
+          <Text style={[styles.statNum, { color: '#2196F3' }]}>{userCount}</Text>
+          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>USERS</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.statCard, { borderColor: '#AF52DE40', backgroundColor: isDark ? '#141414' : '#fff' }]}
+          onPress={fetchActivity}
+        >
+          <IconSymbol name="waveform.path.ecg" size={14} color="#AF52DE" />
+          <Text style={[styles.statNum, { color: '#AF52DE' }]}>{logCount}</Text>
+          <Text style={[styles.statLabel, { color: isDark ? '#555' : '#888' }]}>ACTIVITY</Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -184,6 +255,136 @@ export default function AdminDashboard() {
           </View>
         }
       />
+
+      {/* ALL DEVICES MODAL */}
+      <Modal visible={showAllDevicesModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: isDark ? '#0a0a0a' : '#f5f5f5' }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.modalBackBtn} 
+              onPress={() => setShowAllDevicesModal(false)}
+            >
+              <IconSymbol name="chevron.left" size={24} color={isDark ? '#fff' : '#000'} />
+              <Text style={[styles.modalBackText, { color: isDark ? '#fff' : '#000' }]}>Back</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>All Devices</Text>
+            <View style={{ width: 60 }} />
+          </View>
+          
+          <FlatList
+            data={Object.values(allDevices)}
+            keyExtractor={(item) => item.mac}
+            renderItem={({ item }) => (
+              <View style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 10 }]}>
+                {renderDeviceRow(item)}
+              </View>
+            )}
+            contentContainerStyle={styles.modalList}
+            showsVerticalScrollIndicator={false}
+          />
+        </SafeAreaView>
+      </Modal>
+
+      {/* ALL USERS MODAL */}
+      <Modal visible={showAllUsersModal} animationType="slide" transparent={false}>
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: isDark ? '#0a0a0a' : '#f5f5f5' }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity 
+              style={styles.modalBackBtn} 
+              onPress={() => setShowAllUsersModal(false)}
+            >
+              <IconSymbol name="chevron.left" size={24} color={isDark ? '#fff' : '#000'} />
+              <Text style={[styles.modalBackText, { color: isDark ? '#fff' : '#000' }]}>Back</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>Community Users</Text>
+            <View style={{ width: 60 }} />
+          </View>
+          
+          <FlatList
+            data={userList}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 12 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                  <View style={[styles.userAvatar, { backgroundColor: isDark ? '#222' : '#f0f0f0' }]}>
+                    <IconSymbol name="person.fill" size={20} color={isDark ? '#555' : '#888'} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.houseName, { color: isDark ? '#fff' : '#000', fontSize: 16 }]}>{item.name}</Text>
+                    <Text style={[styles.userEmail, { color: isDark ? '#2196F3' : '#1565C0' }]}>
+                      {/* Note: Profiles might not have email, showing Community as fallback or Gmail if available */}
+                      {item.community || 'Resident'}
+                    </Text>
+                    <Text style={[styles.houseCommunity, { color: isDark ? '#444' : '#999', marginTop: 2 }]}>
+                      UID: {item.id.slice(0, 8)}...
+                    </Text>
+                  </View>
+                  {item.block_lot && (
+                    <View style={styles.locationBadge}>
+                      <Text style={styles.locationBadgeText}>{item.block_lot}</Text>
+                    </View>
+                  )}
+                </View>
+              </View>
+            )}
+            contentContainerStyle={styles.modalList}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <Text style={{ color: '#888' }}>No residents found.</Text>
+              </View>
+            }
+          />
+        </SafeAreaView>
+      </Modal>
+
+      {/* BROADCAST MODAL */}
+      <Modal visible={showBroadcastModal} animationType="fade" transparent={true}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.broadcastCard, { backgroundColor: isDark ? '#141414' : '#fff' }]}>
+            <View style={styles.broadcastHeader}>
+              <IconSymbol name="megaphone.fill" size={24} color={ACCENT} />
+              <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000', marginLeft: 10 }]}>Community Broadcast</Text>
+            </View>
+            
+            <Text style={[styles.broadcastDesc, { color: isDark ? '#888' : '#666' }]}>
+              This will send a real-time emergency alert to all active residents.
+            </Text>
+
+            <TextInput
+              style={[styles.broadcastInput, { 
+                backgroundColor: isDark ? '#0a0a0a' : '#f5f5f5',
+                color: isDark ? '#fff' : '#000'
+              }]}
+              placeholder="Type your emergency message..."
+              placeholderTextColor="#555"
+              multiline
+              numberOfLines={4}
+              value={broadcastMessage}
+              onChangeText={setBroadcastMessage}
+            />
+
+            <View style={styles.broadcastActions}>
+              <TouchableOpacity 
+                style={[styles.broadcastBtn, { backgroundColor: isDark ? '#222' : '#eee' }]} 
+                onPress={() => setShowBroadcastModal(false)}
+              >
+                <Text style={[styles.broadcastBtnText, { color: isDark ? '#fff' : '#000' }]}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.broadcastBtn, { backgroundColor: ACCENT }]} 
+                onPress={handleBroadcast}
+                disabled={broadcasting}
+              >
+                {broadcasting ? <ActivityIndicator color="#fff" /> : (
+                  <Text style={[styles.broadcastBtnText, { color: '#fff' }]}>Send Alert</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -204,8 +405,8 @@ const styles = StyleSheet.create({
   roleText: { fontSize: 11, fontWeight: '900' },
   statsRow: { flexDirection: 'row', paddingHorizontal: 16, gap: 10, marginBottom: 16 },
   statCard: {
-    flex: 1, backgroundColor: '#141414', borderRadius: 16, padding: 12,
-    alignItems: 'center', borderWidth: 1,
+    flex: 1, backgroundColor: '#141414', borderRadius: 16, padding: 10,
+    alignItems: 'center', borderWidth: 1, minHeight: 85, justifyContent: 'center',
   },
   statNum: { fontSize: 28, fontWeight: '900' },
   statLabel: { color: '#555', fontSize: 8, fontWeight: '900', letterSpacing: 1, marginTop: 2 },
@@ -231,4 +432,26 @@ const styles = StyleSheet.create({
   ppmBarFill: { height: '100%', borderRadius: 2 },
   empty: { alignItems: 'center', justifyContent: 'center', marginTop: 80 },
   emptyText: { fontWeight: '700', marginTop: 16, textAlign: 'center', lineHeight: 22 },
+
+  // Modal Styles
+  modalContainer: { flex: 1 },
+  modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: 'rgba(128,128,128,0.1)' },
+  modalBackBtn: { flexDirection: 'row', alignItems: 'center' },
+  modalBackText: { fontSize: 16, fontWeight: '700', marginLeft: 5 },
+  modalHeaderTitle: { fontSize: 18, fontWeight: '900' },
+  modalList: { padding: 16 },
+  userAvatar: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
+  userEmail: { fontSize: 12, fontWeight: '700' },
+  locationBadge: { backgroundColor: 'rgba(33, 150, 243, 0.1)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+  locationBadgeText: { color: '#2196F3', fontSize: 10, fontWeight: '900' },
+
+  // Broadcast Modal Styles
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 24 },
+  broadcastCard: { borderRadius: 24, padding: 24, gap: 16 },
+  broadcastHeader: { flexDirection: 'row', alignItems: 'center' },
+  broadcastDesc: { fontSize: 14, lineHeight: 20 },
+  broadcastInput: { borderRadius: 12, padding: 15, fontSize: 16, height: 100, textAlignVertical: 'top' },
+  broadcastActions: { flexDirection: 'row', gap: 12 },
+  broadcastBtn: { flex: 1, height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+  broadcastBtnText: { fontWeight: '900', fontSize: 14 },
 });

@@ -153,14 +153,22 @@ export default function AdminDashboard() {
         <View style={styles.statsContainer}>
           <TouchableOpacity 
             style={styles.statsBadge} 
-            onPress={() => setShowAllDevicesModal(true)}
+            onPress={() => {
+              console.log('Stats Badge Clicked');
+              setShowAllDevicesModal(true);
+            }}
+            hitSlop={{ top: 20, bottom: 20, left: 10, right: 10 }}
           >
             <View style={styles.pulseDot} />
             <Text style={styles.statsText}>{finalDisplayList.filter(d => !d.isInactive).length} LIVE</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.statsBadge, { backgroundColor: 'rgba(33, 150, 243, 0.15)', marginLeft: 8 }]} 
-            onPress={() => setShowAllDevicesModal(true)}
+            onPress={() => {
+              console.log('Total Badge Clicked');
+              setShowAllDevicesModal(true);
+            }}
+            hitSlop={{ top: 20, bottom: 20, left: 10, right: 10 }}
           >
             <IconSymbol name="cpu" size={10} color="#2196F3" />
             <Text style={[styles.statsText, { color: '#2196F3' }]}>{finalDisplayList.length} TOTAL</Text>
@@ -266,11 +274,11 @@ export default function AdminDashboard() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, paddingVertical: 20 },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 25, paddingVertical: 20, zIndex: 100 },
   headerSub: { color: '#2196F3', fontSize: 10, fontWeight: '900', letterSpacing: 2 },
   headerTitle: { fontSize: 28, fontWeight: '900', marginTop: 2 },
   statsContainer: { flexDirection: 'row', alignItems: 'center' },
-  statsBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(52, 199, 89, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
+  statsBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(52, 199, 89, 0.15)', paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20 },
   statsText: { color: '#34C759', fontSize: 10, fontWeight: '900', marginLeft: 6 },
   pulseDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#34C759' },
 
