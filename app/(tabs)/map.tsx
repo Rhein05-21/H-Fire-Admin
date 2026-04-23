@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import MapView, { Marker, Callout } from '@/components/CommunityMap';
+import MapView, { Marker, Callout, PROVIDER_GOOGLE } from '@/components/CommunityMap';
 import { supabase } from '@/utils/supabase';
 import { useAdmin, Device } from '@/context/AdminContext';
 import { useAppTheme } from '@/context/ThemeContext';
@@ -25,18 +25,41 @@ function getMarkerColor(worstPpm: number, hasDevices: boolean): string {
 }
 
 export default function AdminMapScreen() {
-  const { allDevices } = useAdmin();
+  const { allDevices, activeIncident } = useAdmin();
   const { colorScheme } = useAppTheme();
   const insets = useSafeAreaInsets();
+  const mapRef = useRef<MapView>(null);
   const isDark = colorScheme === 'dark';
   const [profiles, setProfiles] = useState<ProfileLocation[]>([]);
   const [loading, setLoading] = useState(true);
+  const lastIncidentId = useRef<string | number | null>(null);
 
   // Tab bar height calculation logic (must match _layout.tsx)
   const TAB_BAR_CONTENT_HEIGHT = 60;
   const bottomPadding = Math.max(insets.bottom, 15);
   const totalTabBarHeight = TAB_BAR_CONTENT_HEIGHT + bottomPadding;
   const floatingBottom = totalTabBarHeight + 16;
+
+  // Auto-locate active incident
+  useEffect(() => {
+    if (activeIncident && activeIncident.id !== lastIncidentId.current) {
+      lastIncidentId.current = activeIncident.id;
+      
+      // Find coordinates for the incident's device/profile
+      const device = activeIncident.device_mac ? allDevices[activeIncident.device_mac] : null;
+      const profileId = device?.profile_id;
+      const profile = profiles.find(p => p.id === profileId);
+
+      if (profile?.latitude && profile?.longitude) {
+        mapRef.current?.animateToRegion({
+          latitude: profile.latitude,
+          longitude: profile.longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        }, 1000);
+      }
+    }
+  }, [activeIncident, profiles, allDevices]);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -102,6 +125,8 @@ export default function AdminMapScreen() {
       </View>
 
       <MapView 
+        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
         style={styles.map} 
         initialRegion={initialRegion} 
         mapType="standard"

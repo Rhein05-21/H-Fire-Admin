@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
-  Alert, ScrollView, ActivityIndicator, Platform,
+  Alert, ScrollView, ActivityIndicator, Platform, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -16,15 +16,19 @@ const HOA_ACCENT = '#1565C0';
 export default function AdminSettings() {
   const { role, logout, user } = useAdminAuth();
   const { theme, setTheme, colorScheme } = useAppTheme();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const isAdmin = role === 'admin';
   const isDark = colorScheme === 'dark';
 
   const handleLogout = () => {
-    Alert.alert('Sign Out', 'Are you sure you want to sign out of the Admin Console?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: () => logout() },
-    ]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutModal(false);
+    logout();
   };
 
   return (
@@ -34,8 +38,13 @@ export default function AdminSettings() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.brandText}>ADMIN SETTINGS</Text>
-          <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>Configuration</Text>
+          <View>
+            <Text style={styles.brandText}>ADMIN SETTINGS</Text>
+            <Text style={[styles.title, { color: isDark ? '#fff' : '#000' }]}>Configuration</Text>
+          </View>
+          <TouchableOpacity onPress={handleLogout} style={styles.headerLogoutBtn}>
+            <Text style={styles.headerLogoutText}>Sign Out</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Minimal Role Badge */}
@@ -104,13 +113,40 @@ export default function AdminSettings() {
             </View>
           </View>
         )}
-
-        {/* Logout */}
-        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
-          <IconSymbol name="arrow.left.square.fill" size={18} color={ACCENT} />
-          <Text style={styles.logoutText}>Sign Out</Text>
-        </TouchableOpacity>
       </ScrollView>
+
+      {/* CUSTOM THEMED LOGOUT MODAL */}
+      <Modal
+        visible={showLogoutModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLogoutModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalCard, { backgroundColor: isDark ? '#141414' : '#fff' }]}>
+            <Text style={[styles.modalTitle, { color: isDark ? '#fff' : '#000' }]}>Sign Out</Text>
+            <Text style={[styles.modalDesc, { color: isDark ? '#888' : '#666' }]}>
+              Are you sure you want to sign out of the Admin Console?
+            </Text>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalBtn, { backgroundColor: isDark ? '#1a1a1a' : '#f0f0f0' }]}
+                onPress={() => setShowLogoutModal(false)}
+              >
+                <Text style={[styles.modalBtnText, { color: isDark ? '#fff' : '#000' }]}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.modalBtn, { backgroundColor: ACCENT }]}
+                onPress={confirmLogout}
+              >
+                <Text style={[styles.modalBtnText, { color: '#fff' }]}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -118,7 +154,9 @@ export default function AdminSettings() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0a0a' },
   scroll: { padding: 24, paddingBottom: 120 },
-  header: { marginBottom: 24 },
+  header: { marginBottom: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  headerLogoutBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, backgroundColor: 'rgba(229, 57, 51, 0.1)' },
+  headerLogoutText: { color: ACCENT, fontSize: 12, fontWeight: '900', letterSpacing: 0.5 },
   brandText: { color: ACCENT, fontSize: 10, fontWeight: '900', letterSpacing: 3 },
   title: { color: '#fff', fontSize: 28, fontWeight: '900', marginTop: 4 },
   roleCard: {
@@ -145,6 +183,52 @@ const styles = StyleSheet.create({
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#1e1e1e' },
   infoKey: { color: '#555', fontWeight: '700', fontSize: 13 },
   infoVal: { color: '#aaa', fontWeight: '700', fontSize: 13 },
-  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 18, backgroundColor: `${ACCENT}15`, borderRadius: 18, borderWidth: 1, borderColor: `${ACCENT}30` },
-  logoutText: { color: ACCENT, fontWeight: '900', fontSize: 16 },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    width: '100%',
+    borderRadius: 28,
+    padding: 30,
+    alignItems: 'center',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    marginBottom: 12,
+  },
+  modalDesc: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 30,
+    paddingHorizontal: 10,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  modalBtn: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBtnText: {
+    fontSize: 15,
+    fontWeight: '900',
+  },
 });

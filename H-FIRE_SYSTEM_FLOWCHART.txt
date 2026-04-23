@@ -1,0 +1,112 @@
+H-FIRE SYSTEM ARCHITECTURE & FLOWCHART (Updated with Future Plans)
+============================================================
+
+MERMAID CODE:
+(Copy and paste the code BELOW into https://mermaid.live/)
+
+graph TD
+    %% Global Styles
+    classDef hardware fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef resident fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef admin fill:#f96,stroke:#333,stroke-width:2px;
+    classDef cloud fill:#dfd,stroke:#333,stroke-width:2px;
+    classDef future fill:#fff,stroke:#333,stroke-dasharray: 5 5;
+
+    %% 1. Hardware Layer
+    subgraph Hardware_Layer ["1. IoT HARDWARE"]
+        HW["ESP32 + MQ2 + Flame Sensor"]:::hardware
+    end
+
+    %% 2. Messaging & Bridge
+    subgraph Messaging_Layer ["2. DATA TRANSMISSION"]
+        MQTT[("HiveMQ MQTT Broker")]:::cloud
+        Bridge["Node.js Bridge Script"]:::cloud
+    end
+
+    %% 3. Resident App Layer
+    subgraph Resident_App ["3. RESIDENT APP"]
+        R_UI["Real-time Gas Dashboard"]:::resident
+        R_Map["Set Home Location"]:::resident
+        R_Alert["Emergency Siren Modal"]:::resident
+        R_Confirm["Manual Confirmation/SOS"]:::resident
+    end
+
+    %% 4. Backend Database
+    subgraph Backend_Layer ["4. CLERK & SUPABASE"]
+        Auth["Clerk Authentication"]:::cloud
+        DB[("Supabase Database")]:::cloud
+        Logs["Gas Logs / Incidents Table"]:::cloud
+        Push["Expo Push Notification"]:::cloud
+    end
+
+    %% 5. Admin App Layer
+    subgraph Admin_App ["5. ADMIN APP"]
+        A_Dash["Admin Dashboard Monitoring"]:::admin
+        A_Map["Community Map Overview"]:::admin
+        A_Siren["Emergency Siren Modal"]:::admin
+        A_Action["Dispatch & Resolve Button"]:::admin
+    end
+
+    %% 6. Future Implementation (Conditional Auto-Call)
+    subgraph Future_Plans ["6. FUTURE ENHANCEMENTS"]
+        Logic{"Fire Confirmed?"}:::future
+        Timer["Wait for Timeout"]:::future
+        F_Call["AUTOMATIC HOTLINE CALL - BFP"]:::future
+    end
+
+    %% Connection Logic
+    HW --> MQTT
+    MQTT --> R_UI
+    MQTT --> Bridge
+    Bridge --> Logs
+    
+    R_Map --> DB
+    Logs --> A_Dash
+    Logs --> A_Map
+    
+    %% Emergency Path
+    Logs --> Push
+    Push --> R_Alert
+    Push --> A_Siren
+
+    %% Future Auto-Call Logic
+    A_Siren --> Timer
+    Timer --> Logic
+    Logic -->|No Confirmation| F_Call
+    R_Confirm -.->|Manual Yes| Logic
+    A_Action -.->|Manual Yes| Logic
+
+    %% Resolution Path
+    A_Action --> Logs
+    Logs --> R_Alert
+    Logs --> A_Siren
+
+============================================================
+
+PROCESS BREAKDOWN:
+
+1. HARDWARE LAYER:
+   - Sensors detect smoke (PPM) or actual flame.
+   - ESP32 publishes data every few seconds to the MQTT broker.
+
+2. RESIDENT SIDE:
+   - Receives instant updates. If a hazard is detected, the phone siren goes off.
+   - Homeowner has the option to "Confirm" the fire or "Dismiss" (if it's a false alarm).
+
+3. DATA BRIDGE:
+   - Central hub that connects IoT data to the permanent database (Supabase).
+
+4. ADMIN SIDE:
+   - Monitoring center that sees all active alerts in the community.
+   - Map automatically centers on the affected household using stored GPS data.
+
+5. NOTIFICATIONS:
+   - Critical alerts are sent via Push Notifications to ensure users see them immediately.
+
+6. FUTURE AUTO-CALL LOGIC (PLANNED):
+   - WHEN FIRE IS DETECTED: A countdown timer starts.
+   - IF RESIDENT OR HOA DOES NOT CONFIRM/RESOLVE: The system will conclude 
+     that the residents are unable to respond (possibly trapped or unconscious).
+   - ACTION: The system will automatically trigger a voice call or digital 
+     alert to the BFP (Bureau of Fire Protection) hotline with the exact 
+     address and household details.
