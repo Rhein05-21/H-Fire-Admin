@@ -5,7 +5,7 @@ import { SymbolWeight, SymbolViewProps } from 'expo-symbols';
 import { ComponentProps } from 'react';
 import { OpaqueColorValue, type StyleProp, type TextStyle } from 'react-native';
 
-type IconMapping = Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>;
+type IconMapping = Partial<Record<SymbolViewProps['name'], ComponentProps<typeof MaterialIcons>['name']>>;
 type IconSymbolName = keyof typeof MAPPING;
 
 /**
@@ -18,10 +18,12 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'chevron.left': 'chevron-left',
   'waveform.path.ecg': 'sensors',
   'clock.fill': 'history',
   'pencil.circle.fill': 'edit',
   'check.circle.fill': 'check-circle',
+  'checkmark.circle.fill': 'check-circle',
   'exclamationmark.triangle.fill': 'warning',
   'flame.fill': 'local-fire-department',
   'sensor.fill': 'sensors',
@@ -34,7 +36,14 @@ const MAPPING = {
   'sun.max.fill': 'light-mode',
   'moon.fill': 'dark-mode',
   'map.fill': 'map',
-} as IconMapping;
+  'bolt.fill': 'bolt',
+  'cpu': 'memory',
+  'phone.fill': 'phone',
+  'checkmark.shield.fill': 'verified-user',
+  'person.2.fill': 'people',
+  'person.fill': 'person',
+  'megaphone.fill': 'campaign',
+};
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.
@@ -53,5 +62,5 @@ export function IconSymbol({
   style?: StyleProp<TextStyle>;
   weight?: SymbolWeight;
 }) {
-  return <MaterialIcons color={color} size={size} name={MAPPING[name]} style={style} />;
+  return <MaterialIcons color={color} size={size} name={MAPPING[name] as any} style={style} />;
 }

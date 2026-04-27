@@ -2,6 +2,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Device, useAdmin } from '@/context/AdminContext';
 import { useAppTheme } from '@/context/ThemeContext';
+import { supabase } from '@/utils/supabase';
 import * as Haptics from 'expo-haptics';
 import { StatusBar } from 'expo-status-bar';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
     try {
       // Broadcast via Supabase Realtime channel
       const channel = supabase.channel('global-alerts');
-      await channel.subscribe(async (status) => {
+      await channel.subscribe(async (status: string) => {
         if (status === 'SUBSCRIBED') {
           await channel.send({
             type: 'broadcast',

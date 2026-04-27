@@ -98,7 +98,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const verifySignUp = async (code: string): Promise<{ success: boolean; error?: string }> => {
-    if (!signUpLoaded) return { success: false, error: 'Sign up not ready.' };
+    if (!signUpLoaded || !setActive) return { success: false, error: 'Sign up not ready.' };
     try {
       const result = await clerkSignUp.attemptEmailAddressVerification({ code });
       if (result.status === 'complete') {
