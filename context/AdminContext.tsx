@@ -11,7 +11,7 @@ export interface Device {
   label: string;
   houseId: string;
   community?: string;
-  lastSeen: Date;
+  lastSeen: Date | null;
   profile_id?: string | null;
   house_name?: string;
 }
@@ -29,6 +29,7 @@ interface Incident {
 interface AdminContextType {
   allDevices: Record<string, Device>;
   allProfiles: Record<string, any>;
+  allFamilyMembers: any[];
   activeIncident: Incident | null;
   triggerEmergency: (incident: Incident) => void;
   dismissEmergency: () => void;
@@ -43,6 +44,7 @@ const HIVEMQ_URL = `wss://${process.env.EXPO_PUBLIC_HIVEMQ_BROKER}:${process.env
 export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [allDevices, setAllDevices] = useState<Record<string, Device>>({});
   const [allProfiles, setAllProfiles] = useState<Record<string, any>>({});
+  const [allFamilyMembers, setAllFamilyMembers] = useState<any[]>([]);
   const [activeIncident, setActiveIncident] = useState<Incident | null>(null);
   const [mqttConnected, setMqttConnected] = useState(false);
 
@@ -54,14 +56,37 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const { data: devs } = await supabase.from('devices').select('*');
     if (devs) {
       const cache: Record<string, any> = {};
-      devs.forEach(d => { cache[d.mac] = d; });
+      const initialDevices: Record<string, Device> = {};
+      
+      devs.forEach(d => { 
+        cache[d.mac] = d; 
+        initialDevices[d.mac] = {
+          id: d.mac,
+          mac: d.mac,
+          ppm: 0,
+          status: 'Offline',
+          label: d.label,
+          houseId: d.house_name,
+          house_name: d.house_name,
+          community: d.block_lot || d.community || '',
+          lastSeen: d.last_seen ? new Date(d.last_seen) : null,
+          profile_id: d.profile_id,
+        };
+      });
       registryRef.current = cache;
+      setAllDevices(initialDevices);
     }
-    const { data: profiles } = await supabase.from('profiles').select('*');
+    const { data: profiles } = await supabase.from('profiles').select('*, email');
     if (profiles) {
+      // console.log('Loaded profiles sample:', profiles[0]); // Useful for debugging columns
       const cache: Record<string, any> = {};
       profiles.forEach(p => { cache[p.id] = p; });
       setAllProfiles(cache);
+    }
+
+    const { data: families } = await supabase.from('family_members').select('*');
+    if (families) {
+      setAllFamilyMembers(families);
     }
   };
 
@@ -72,7 +97,26 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const ch = supabase.channel('admin-registry-sync')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'devices' }, payload => {
         const d = payload.new as any;
-        if (d) registryRef.current = { ...registryRef.current, [d.mac]: d };
+        if (d) {
+          registryRef.current = { ...registryRef.current, [d.mac]: d };
+          // Keep allDevices in sync with database changes
+          setAllDevices(prev => {
+            const existing = prev[d.mac];
+            return {
+              ...prev,
+              [d.mac]: {
+                ...(existing || { ppm: 0, status: 'Offline', lastSeen: d.last_seen ? new Date(d.last_seen) : null }),
+                id: d.mac,
+                mac: d.mac,
+                label: d.label,
+                houseId: d.house_name,
+                house_name: d.house_name,
+                community: d.block_lot || d.community || '',
+                profile_id: d.profile_id,
+              }
+            };
+          });
+        }
       })
       .subscribe();
     return () => { ch.unsubscribe(); };
@@ -157,7 +201,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AdminContext.Provider value={{ 
-      allDevices, allProfiles, activeIncident, triggerEmergency, dismissEmergency, mqttConnected,
+      allDevices, allProfiles, allFamilyMembers, activeIncident, triggerEmergency, dismissEmergency, mqttConnected,
       refreshRegistry: loadRegistry
     }}>
       {children}

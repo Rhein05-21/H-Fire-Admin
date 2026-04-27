@@ -8,6 +8,7 @@ import { useThemeColor } from '@/hooks/use-theme-color';
 import { useAppTheme } from '@/context/ThemeContext';
 import { getStatusColor } from '@/constants/thresholds';
 import { useAdmin } from '@/context/AdminContext';
+import { useAdminAuth } from '@/context/AdminAuthContext';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 const { width, height } = Dimensions.get('window');
@@ -22,6 +23,7 @@ const getStatusData = (ppm: number, isInactive: boolean) => {
 export default function AdminDashboard() {
   const { colorScheme } = useAppTheme();
   const { allDevices: liveMqttData, triggerEmergency } = useAdmin();
+  const { role } = useAdminAuth();
   
   const backgroundColor = useThemeColor({}, 'background');
   const cardBg = useThemeColor({ light: '#fff', dark: '#1c1c1e' }, 'background');
@@ -110,23 +112,25 @@ export default function AdminDashboard() {
           <View style={[styles.miniBadge, { backgroundColor: item.uiColor + '20' }]}>
             <Text style={[styles.miniBadgeText, { color: item.uiColor }]}>{item.uiLabel}</Text>
           </View>
-          <TouchableOpacity 
-            style={styles.forceBtn} 
-            onPress={(e) => {
-              e.stopPropagation();
-              triggerEmergency({
-                id: `force_${Date.now()}`,
-                house_name: item.house_name,
-                label: item.label,
-                ppm: item.ppm,
-                alert_type: item.ppm > 1500 ? 'FIRE' : 'GAS/SMOKE',
-                device_mac: item.mac
-              });
-            }}
-          >
-            <IconSymbol name="bolt.fill" size={10} color="#FF3B30" />
-            <Text style={styles.forceBtnText}>FORCE SIREN</Text>
-          </TouchableOpacity>
+          {role === 'admin' && (
+            <TouchableOpacity 
+              style={styles.forceBtn} 
+              onPress={(e) => {
+                e.stopPropagation();
+                triggerEmergency({
+                  id: `force_${Date.now()}`,
+                  house_name: item.house_name,
+                  label: item.label,
+                  ppm: item.ppm,
+                  alert_type: item.ppm > 1500 ? 'FIRE' : 'GAS/SMOKE',
+                  device_mac: item.mac
+                });
+              }}
+            >
+              <IconSymbol name="bolt.fill" size={10} color="#FF3B30" />
+              <Text style={styles.forceBtnText}>FORCE SIREN</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <View style={styles.ppmContainer}>
@@ -248,7 +252,7 @@ export default function AdminDashboard() {
 
           {selectedDevice && (() => {
             const live = liveMqttData[selectedDevice.mac] || selectedDevice;
-            const isInactive = (Date.now() - new Date(live.lastSeen).getTime() > 60000);
+            const isInactive = !live.lastSeen || (Date.now() - new Date(live.lastSeen).getTime() > 60000);
             const status = getStatusData(live.ppm, isInactive);
             
             return (

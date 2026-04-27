@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser, useAuth, useSignIn, useSignUp } from '@clerk/clerk-expo';
 import { supabase } from '@/utils/supabase';
 
-export type AdminRole = 'admin' | 'hoa' | null;
+export type AdminRole = 'admin' | 'hoa' | 'guard' | 'resident' | null;
 
 interface AdminAuthContextType {
   role: AdminRole;
@@ -36,17 +36,40 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
           // Check Supabase profiles table by email
           const { data: profile } = await supabase
             .from('profiles')
-            .select('is_admin')
+            .select('is_admin, email, name, role')
             .eq('email', user.primaryEmailAddress?.emailAddress)
             .single();
 
-          if (profile && profile.is_admin === false) {
-            // Force logout if not admin
+          // Sync Clerk info to Supabase (Upsert)
+          const clerkEmail = user.primaryEmailAddress?.emailAddress;
+          if (clerkEmail) {
+            // Check if there are ANY profiles at all
+            const { count } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+            const isFirstUser = count === 0;
+
+            await supabase
+              .from('profiles')
+              .upsert({ 
+                id: user.id, 
+                email: clerkEmail,
+                name: user.fullName || profile?.name || 'Admin User',
+                // If it's the first user ever, or already marked admin, keep it. 
+                is_admin: isFirstUser ? true : (profile?.is_admin ?? false),
+                role: isFirstUser ? 'admin' : (profile?.role ?? 'resident')
+              }, { onConflict: 'id' });
+          }
+
+          // If the profile exists and is explicitly NOT an admin/hoa/guard, then logout
+          const metadataRole = user.publicMetadata.role as AdminRole;
+          const dbRole = profile?.role as AdminRole;
+          const finalRole = metadataRole || dbRole || (profile?.is_admin ? 'admin' : null);
+
+          // Only force logout if the user is explicitly a standard resident in the DB
+          if (profile && profile.role === 'resident' && !profile.is_admin) {
             await signOut();
             setRole(null);
           } else {
-            const metadataRole = user.publicMetadata.role as AdminRole;
-            setRole(metadataRole || 'hoa');
+            setRole(finalRole || 'admin'); 
           }
         } catch (err) {
           console.error('Error checking admin status:', err);
@@ -67,12 +90,13 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       // For standard login, check Supabase BEFORE completing Clerk login
       const { data: profile } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, role')
         .eq('email', email)
         .single();
       
-      if (profile && profile.is_admin === false) {
-        return { success: false, error: "This user already exist and can't be an admin" };
+      const userRole = profile?.role || (profile?.is_admin ? 'admin' : 'resident');
+      if (profile && userRole === 'resident') {
+        return { success: false, error: "Residents cannot access the Admin Panel." };
       }
 
       const result = await signIn.create({ identifier: email, password });
@@ -164,4 +188,3 @@ export function useAdminAuth() {
   if (!ctx) throw new Error('useAdminAuth must be inside AdminAuthProvider');
   return ctx;
 }
-

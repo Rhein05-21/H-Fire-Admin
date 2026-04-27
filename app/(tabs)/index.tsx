@@ -25,6 +25,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
 const ACCENT = '#E53935';
 
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'Administrator',
+  hoa: 'HOA Member',
+  resident: 'Resident',
+  guard: 'Security Guard'
+};
+
 function getStatusData(ppm: number, isInactive: boolean, flame?: boolean) {
   if (isInactive) return { color: '#555', label: 'OFFLINE', icon: 'wifi.slash', msg: 'No signal' };
   if (ppm > 1500 || flame) return { color: ACCENT, label: flame ? '🔥 FLAME' : '🔥 FIRE', icon: 'flame.fill', msg: 'CRITICAL — EVACUATE NOW' };
@@ -41,7 +48,7 @@ interface GroupedHouse {
 }
 
 export default function AdminDashboard() {
-  const { allDevices, allProfiles, mqttConnected } = useAdmin();
+  const { allDevices, allProfiles, allFamilyMembers, mqttConnected } = useAdmin();
   const { role } = useAdminAuth();
   const { colorScheme } = useAppTheme();
   const [refreshing, setRefreshing] = useState(false);
@@ -52,6 +59,101 @@ export default function AdminDashboard() {
   const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [broadcasting, setBroadcasting] = useState(false);
+
+  const [deviceSearch, setDeviceSearch] = useState('');
+  const [devicePage, setDevicePage] = useState(1);
+  const PAGE_SIZE = 10;
+
+  const [userSearch, setUserSearch] = useState('');
+  const [userPage, setUserPage] = useState(1);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [showUserDetail, setShowUserDetail] = useState(false);
+  const [isEditingUser, setIsEditingUser] = useState(false);
+  const [editUserData, setEditUser] = useState({
+    name: '',
+    email: '',
+    block_lot: '',
+    address: ''
+  });
+
+  // Create User Form State
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+    setCreatingUser(true); // Reusing loading state
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          name: editUserData.name,
+          email: editUserData.email.toLowerCase(),
+          block_lot: editUserData.block_lot,
+          address: editUserData.address
+        })
+        .eq('id', selectedUser.id);
+
+      if (error) throw error;
+
+      Alert.alert('Success', 'User profile updated successfully.');
+      setIsEditingUser(false);
+      setShowUserDetail(false);
+      // Data will refresh via Realtime/Context
+    } catch (err: any) {
+      Alert.alert('Update Failed', err.message);
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+  const [showCreateUser, setShowCreateUser] = useState(false);
+  const [newUser, setNewUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'resident' as 'admin' | 'hoa' | 'resident' | 'guard',
+    block_lot: '',
+    community: ''
+  });
+  const [formErrors, setFormErrors] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+  });
+  const [creatingUser, setCreatingUser] = useState(false);
+
+  const validateField = async (name: string, value: string) => {
+    let error = '';
+    switch (name) {
+      case 'firstName':
+      case 'lastName':
+        if (value.length > 0 && value.length < 2) error = 'Minimum 2 characters required';
+        break;
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (value.length > 0) {
+          if (!emailRegex.test(value)) {
+            error = 'Invalid email format';
+          } else {
+            // Real-time DB Check
+            const { data } = await supabase
+              .from('profiles')
+              .select('id')
+              .eq('email', value.toLowerCase())
+              .single();
+            if (data) error = 'This email is already registered';
+          }
+        }
+        break;
+      case 'password':
+        const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (value.length > 0) {
+          if (value.length < 8) error = 'Minimum 8 characters required';
+          else if (!strongPassword.test(value)) error = 'Must include Upper, Lower, Number, and Special Char';
+        }
+        break;
+    }
+    setFormErrors(prev => ({ ...prev, [name]: error }));
+  };
 
   const isDark = colorScheme === 'dark';
 
@@ -108,10 +210,16 @@ export default function AdminDashboard() {
     setTimeout(() => setRefreshing(false), 1000);
   };
 
-  // Group devices by house_name
+  // Group devices by house_name (Only active devices for the main feed)
   const groupedHouses = useMemo((): GroupedHouse[] => {
     const map: Record<string, GroupedHouse> = {};
+    const now = Date.now();
+
     Object.values(allDevices).forEach(dev => {
+      // Filter: Only show devices seen in the last 60 seconds on the main dashboard
+      const isInactive = !dev.lastSeen || (now - new Date(dev.lastSeen).getTime() > 60000);
+      if (isInactive) return;
+
       const key = dev.house_name || dev.houseId || 'Unassigned';
       if (!map[key]) {
         map[key] = { house_name: key, community: dev.community || '', devices: [], worstPpm: 0, anyFlame: false };
@@ -128,12 +236,107 @@ export default function AdminDashboard() {
 
   // Summary stats
   const totalDevices = Object.keys(allDevices).length;
-  const userList = useMemo(() => {
-    return Object.values(allProfiles).filter(p => !p.is_admin);
-  }, [allProfiles]);
-  const userCount = userList.length;
+
+  const filteredUsers = useMemo(() => {
+    return Object.values(allProfiles).filter(p => {
+      const search = userSearch.toLowerCase();
+      const nameMatch = (p.name || '').toLowerCase().includes(search);
+      const emailMatch = (p.email || '').toLowerCase().includes(search);
+      const blockMatch = (p.block_lot || '').toLowerCase().includes(search);
+      return nameMatch || emailMatch || blockMatch;
+    }).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }, [allProfiles, userSearch]);
+
+  const paginatedUsers = useMemo(() => {
+    return filteredUsers.slice(0, userPage * PAGE_SIZE);
+  }, [filteredUsers, userPage]);
+
+  const userCount = filteredUsers.length;
+
+  const handleCreateUser = async () => {
+    const { firstName, lastName, email, password, role: userRole, block_lot, community } = newUser;
+    
+    // Final validation check before submission
+    const hasErrors = Object.values(formErrors).some(e => e !== '');
+    if (hasErrors) {
+      Alert.alert('Form Errors', 'Please fix all errors before saving.');
+      return;
+    }
+
+    if (!firstName || !lastName || !email || !password) {
+      Alert.alert('Missing Fields', 'Please fill in all required fields.');
+      return;
+    }
+
+    setCreatingUser(true);
+    try {
+      // 1. Check if email already exists
+      const { data: existingEmail } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .eq('email', email.toLowerCase())
+        .single();
+      
+      if (existingEmail) {
+        Alert.alert('Duplicate Email', `An account with ${email} already exists for ${existingEmail.name}.`);
+        setCreatingUser(false);
+        return;
+      }
+
+      // 2. Check if name + block_lot combination exists (to prevent duplicate residents in same house)
+      const fullName = `${firstName} ${lastName}`;
+      const { data: existingResident } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('name', fullName)
+        .eq('block_lot', block_lot)
+        .single();
+
+      if (existingResident) {
+        Alert.alert('Duplicate Resident', `A resident named ${fullName} is already registered at ${block_lot}.`);
+        setCreatingUser(false);
+        return;
+      }
+
+      // Generate a dummy ID for prototype
+      const dummyId = `user_${Math.random().toString(36).slice(2, 11)}`;
+      
+      const { error } = await supabase.from('profiles').insert({
+        id: dummyId,
+        name: fullName,
+        email: email.toLowerCase(),
+        block_lot,
+        address: community || 'H-Fire Village',
+        is_admin: userRole === 'admin' || userRole === 'hoa',
+      });
+
+      if (error) throw error;
+
+      Alert.alert('Success', `Account for ${firstName} created successfully! (Clerk Auth integration required for production)`);
+      setShowCreateUser(false);
+      setNewUser({ firstName: '', lastName: '', email: '', password: '', role: 'resident', block_lot: '', community: '' });
+    } catch (err: any) {
+      Alert.alert('Error', err.message || 'Failed to create account.');
+    } finally {
+      setCreatingUser(false);
+    }
+  };
   const communityCount = new Set(groupedHouses.map(h => h.community).filter(Boolean)).size || (groupedHouses.length > 0 ? 1 : 0);
   
+  // Filtered and Paginated Devices for Modal
+  const filteredDevices = useMemo(() => {
+    const list = Object.values(allDevices).filter(d => 
+      d.mac.toLowerCase().includes(deviceSearch.toLowerCase()) || 
+      d.label.toLowerCase().includes(deviceSearch.toLowerCase()) ||
+      d.house_name?.toLowerCase().includes(deviceSearch.toLowerCase())
+    );
+    return list;
+  }, [allDevices, deviceSearch]);
+
+  const paginatedDevices = useMemo(() => {
+    return filteredDevices.slice(0, devicePage * PAGE_SIZE);
+  }, [filteredDevices, devicePage]);
+
   const renderDeviceRow = (dev: Device) => {
     const isInactive = !dev.lastSeen || Date.now() - new Date(dev.lastSeen).getTime() > 60000;
     const s = getStatusData(dev.ppm, isInactive, dev.flame);
@@ -156,12 +359,26 @@ export default function AdminDashboard() {
       d => !d.lastSeen || Date.now() - new Date(d.lastSeen).getTime() > 60000
     );
     const s = getStatusData(item.worstPpm, isInactive, item.anyFlame);
+    
+    // Find the owner/resident of the first device in this house
+    const ownerId = item.devices[0]?.profile_id;
+    const owner = ownerId ? allProfiles[ownerId] : null;
+
     return (
       <View style={[styles.houseCard, { borderLeftColor: s.color, backgroundColor: isDark ? '#141414' : '#fff' }]}>
         <View style={styles.houseHeader}>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.houseName, { color: isDark ? '#fff' : '#000' }]}>{item.house_name}</Text>
-            <Text style={[styles.houseCommunity, { color: isDark ? '#555' : '#888' }]}>{item.community || 'Community'}</Text>
+            <Text style={[styles.houseName, { color: isDark ? '#fff' : '#000' }]} numberOfLines={2}>
+              {owner?.block_lot || item.house_name}
+            </Text>
+            <View style={{ marginTop: 4 }}>
+              <Text style={[styles.houseCommunity, { color: isDark ? '#555' : '#888', marginTop: 0 }]}>
+                {owner ? owner.name : 'Unassigned'}
+              </Text>
+              <Text style={[styles.houseCommunity, { color: isDark ? '#444' : '#666', marginTop: 2, fontSize: 10 }]} numberOfLines={3}>
+                {owner?.address || item.community || 'H-Fire Village'}
+              </Text>
+            </View>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: s.color + '20' }]}>
             <Text style={[styles.statusBadgeText, { color: s.color }]}>{s.label}</Text>
@@ -199,9 +416,9 @@ export default function AdminDashboard() {
               {mqttConnected ? 'LIVE' : 'OFFLINE'}
             </Text>
           </View>
-          <View style={[styles.roleBadge, { backgroundColor: role === 'admin' ? `${ACCENT}25` : '#1565C025' }]}>
-            <Text style={[styles.roleText, { color: role === 'admin' ? ACCENT : '#42A5F5' }]}>
-              {role === 'admin' ? '🔴 ADMIN' : '🔵 HOA'}
+          <View style={[styles.roleBadge, { backgroundColor: role === 'admin' ? `${ACCENT}25` : (role === 'hoa' ? '#1565C025' : '#4CAF5025') }]}>
+            <Text style={[styles.roleText, { color: role === 'admin' ? ACCENT : (role === 'hoa' ? '#42A5F5' : '#4CAF50') }]}>
+              {role === 'admin' ? '🔴 ADMIN' : (role === 'hoa' ? '🔵 HOA' : '🟢 GUARD')}
             </Text>
           </View>
         </View>
@@ -271,17 +488,47 @@ export default function AdminDashboard() {
             <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>All Devices</Text>
             <View style={{ width: 60 }} />
           </View>
+
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={[styles.searchInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+              placeholder="Search MAC, Label, House..."
+              placeholderTextColor="#555"
+              value={deviceSearch}
+              onChangeText={(t) => { setDeviceSearch(t); setDevicePage(1); }}
+            />
+          </View>
           
           <FlatList
-            data={Object.values(allDevices)}
+            data={paginatedDevices}
             keyExtractor={(item) => item.mac}
-            renderItem={({ item }) => (
-              <View style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 10 }]}>
-                {renderDeviceRow(item)}
-              </View>
-            )}
+            onEndReached={() => {
+              if (paginatedDevices.length < filteredDevices.length) {
+                setDevicePage(prev => prev + 1);
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            renderItem={({ item }) => {
+              const profile = item.profile_id ? allProfiles[item.profile_id] : null;
+              return (
+                <View style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 10 }]}>
+                  {renderDeviceRow(item)}
+                  <View style={styles.deviceMeta}>
+                    <IconSymbol name="person.fill" size={12} color="#888" />
+                    <Text style={styles.deviceMetaText}>
+                      Linked Account: <Text style={{ color: profile ? '#2196F3' : '#888' }}>{profile?.name || 'Unlinked'}</Text>
+                    </Text>
+                  </View>
+                </View>
+              );
+            }}
             contentContainerStyle={styles.modalList}
             showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View style={styles.empty}>
+                <Text style={{ color: '#888' }}>No devices found matching your search.</Text>
+              </View>
+            }
           />
         </SafeAreaView>
       </Modal>
@@ -298,36 +545,68 @@ export default function AdminDashboard() {
               <Text style={[styles.modalBackText, { color: isDark ? '#fff' : '#000' }]}>Back</Text>
             </TouchableOpacity>
             <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>Community Users</Text>
-            <View style={{ width: 60 }} />
+            {role === 'admin' && (
+              <TouchableOpacity 
+                style={[styles.connBadge, { backgroundColor: ACCENT + '20' }]} 
+                onPress={() => setShowCreateUser(true)}
+              >
+                <Text style={{ color: ACCENT, fontWeight: '900', fontSize: 10 }}>+ ADD USER</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={[styles.searchInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+              placeholder="Search by Name, Email, or Block/Lot..."
+              placeholderTextColor="#555"
+              value={userSearch}
+              onChangeText={(t) => { setUserSearch(t); setUserPage(1); }}
+            />
           </View>
           
           <FlatList
-            data={userList}
+            data={paginatedUsers}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 12 }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                  <View style={[styles.userAvatar, { backgroundColor: isDark ? '#222' : '#f0f0f0' }]}>
-                    <IconSymbol name="person.fill" size={20} color={isDark ? '#555' : '#888'} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[styles.houseName, { color: isDark ? '#fff' : '#000', fontSize: 16 }]}>{item.name}</Text>
-                    <Text style={[styles.userEmail, { color: isDark ? '#2196F3' : '#1565C0' }]}>
-                      {/* Note: Profiles might not have email, showing Community as fallback or Gmail if available */}
-                      {item.community || 'Resident'}
-                    </Text>
-                    <Text style={[styles.houseCommunity, { color: isDark ? '#444' : '#999', marginTop: 2 }]}>
-                      UID: {item.id.slice(0, 8)}...
-                    </Text>
-                  </View>
-                  {item.block_lot && (
-                    <View style={styles.locationBadge}>
-                      <Text style={styles.locationBadgeText}>{item.block_lot}</Text>
+            onEndReached={() => {
+              if (paginatedUsers.length < filteredUsers.length) {
+                setUserPage(prev => prev + 1);
+              }
+            }}
+            onEndReachedThreshold={0.5}
+            renderItem={({ item }) => {
+              const userRole = item.is_admin ? 'Admin/HOA' : (item.name?.toLowerCase().includes('guard') ? 'Guard' : 'Resident');
+              const hasLocation = item.latitude && item.longitude;
+              return (
+                <TouchableOpacity 
+                  style={[styles.houseCard, { backgroundColor: isDark ? '#141414' : '#fff', marginBottom: 12 }]}
+                  onPress={() => {
+                    setSelectedUser(item);
+                    setShowUserDetail(true);
+                  }}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+                    <View style={[styles.userAvatar, { backgroundColor: isDark ? '#222' : '#f0f0f0' }]}>
+                      <IconSymbol name="person.fill" size={20} color={isDark ? '#555' : '#888'} />
                     </View>
-                  )}
-                </View>
-              </View>
-            )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.houseName, { color: isDark ? '#fff' : '#000', fontSize: 16 }]}>{item.name}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <Text style={[styles.userEmail, { color: isDark ? '#2196F3' : '#1565C0' }]}>
+                          {userRole}
+                        </Text>
+                        <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: isDark ? '#333' : '#ddd' }} />
+                        <IconSymbol name="map.fill" size={10} color={hasLocation ? '#34C759' : '#888'} />
+                        <Text style={[styles.houseCommunity, { color: hasLocation ? '#34C759' : (isDark ? '#444' : '#999'), marginTop: 0, fontWeight: '700' }]}>
+                          {item.block_lot || 'No location set'}
+                        </Text>
+                      </View>
+                    </View>
+                    <IconSymbol name="chevron.right" size={16} color="#444" />
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
             contentContainerStyle={styles.modalList}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={
@@ -336,6 +615,290 @@ export default function AdminDashboard() {
               </View>
             }
           />
+        </SafeAreaView>
+      </Modal>
+
+      {/* CREATE USER MODAL */}
+      <Modal visible={showCreateUser} animationType="slide">
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: isDark ? '#0a0a0a' : '#f5f5f5' }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowCreateUser(false)}>
+              <Text style={{ color: ACCENT, fontWeight: '700' }}>Cancel</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>Create Account</Text>
+            <TouchableOpacity onPress={handleCreateUser} disabled={creatingUser}>
+              {creatingUser ? <ActivityIndicator size="small" color={ACCENT} /> : (
+                <Text style={{ color: '#2196F3', fontWeight: '900' }}>SAVE</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={[1]}
+            keyExtractor={i => i.toString()}
+            renderItem={() => (
+              <View style={{ padding: 24, gap: 20 }}>
+                <Text style={[styles.broadcastDesc, { marginBottom: -10, color: isDark ? '#aaa' : '#555' }]}>
+                  Fields marked with * are required. Email must be unique.
+                </Text>
+
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>FULL NAME *</Text>
+                  <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <View style={{ flex: 1 }}>
+                      <TextInput
+                        style={[styles.formInput, { 
+                          backgroundColor: isDark ? '#141414' : '#fff', 
+                          color: isDark ? '#fff' : '#000',
+                          borderColor: formErrors.firstName ? ACCENT : (newUser.firstName.length >= 2 ? '#34C759' : 'rgba(128,128,128,0.1)')
+                        }]}
+                        placeholder="First Name"
+                        placeholderTextColor="#555"
+                        value={newUser.firstName}
+                        onChangeText={t => {
+                          setNewUser(p => ({ ...p, firstName: t }));
+                          validateField('firstName', t);
+                        }}
+                      />
+                      {formErrors.firstName ? <Text style={styles.errorText}>{formErrors.firstName}</Text> : null}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <TextInput
+                        style={[styles.formInput, { 
+                          backgroundColor: isDark ? '#141414' : '#fff', 
+                          color: isDark ? '#fff' : '#000',
+                          borderColor: formErrors.lastName ? ACCENT : (newUser.lastName.length >= 2 ? '#34C759' : 'rgba(128,128,128,0.1)')
+                        }]}
+                        placeholder="Last Name"
+                        placeholderTextColor="#555"
+                        value={newUser.lastName}
+                        onChangeText={t => {
+                          setNewUser(p => ({ ...p, lastName: t }));
+                          validateField('lastName', t);
+                        }}
+                      />
+                      {formErrors.lastName ? <Text style={styles.errorText}>{formErrors.lastName}</Text> : null}
+                    </View>
+                  </View>
+                </View>
+
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>EMAIL ADDRESS *</Text>
+                  <TextInput
+                    style={[styles.formInput, { 
+                      backgroundColor: isDark ? '#141414' : '#fff', 
+                      color: isDark ? '#fff' : '#000',
+                      borderColor: formErrors.email ? ACCENT : (newUser.email.includes('@') && !formErrors.email ? '#34C759' : 'rgba(128,128,128,0.1)')
+                    }]}
+                    placeholder="example@gmail.com"
+                    placeholderTextColor="#555"
+                    autoCapitalize="none"
+                    value={newUser.email}
+                    onChangeText={t => {
+                      setNewUser(p => ({ ...p, email: t }));
+                      validateField('email', t);
+                    }}
+                  />
+                  {formErrors.email ? <Text style={styles.errorText}>{formErrors.email}</Text> : (
+                    newUser.email.includes('@') ? <Text style={[styles.errorText, { color: '#34C759' }]}>Email is available</Text> : null
+                  )}
+                </View>
+
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>PASSWORD *</Text>
+                  <TextInput
+                    style={[styles.formInput, { 
+                      backgroundColor: isDark ? '#141414' : '#fff', 
+                      color: isDark ? '#fff' : '#000',
+                      borderColor: formErrors.password ? ACCENT : (newUser.password.length >= 8 ? '#34C759' : 'rgba(128,128,128,0.1)')
+                    }]}
+                    placeholder="Min 8 chars, 1 special, 1 number"
+                    placeholderTextColor="#555"
+                    secureTextEntry
+                    value={newUser.password}
+                    onChangeText={t => {
+                      setNewUser(p => ({ ...p, password: t }));
+                      validateField('password', t);
+                    }}
+                  />
+                  {formErrors.password ? <Text style={styles.errorText}>{formErrors.password}</Text> : null}
+                </View>
+
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>ACCOUNT ROLE *</Text>
+                  <View style={styles.roleSelector}>
+                    {Object.entries(ROLE_LABELS).map(([r, label]) => (
+                      <TouchableOpacity 
+                        key={r}
+                        style={[
+                          styles.roleOption, 
+                          { 
+                            backgroundColor: newUser.role === r ? (isDark ? '#222' : '#f0f0f0') : (isDark ? '#141414' : '#fff'), 
+                            borderColor: newUser.role === r ? ACCENT : 'rgba(128,128,128,0.1)',
+                            width: '48%'
+                          }
+                        ]}
+                        onPress={() => setNewUser(p => ({ ...p, role: r as any }))}
+                      >
+                        <Text style={[styles.roleOptionText, { color: newUser.role === r ? ACCENT : (isDark ? '#444' : '#888') }]}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>LOCATION (BLOCK/LOT)</Text>
+                  <TextInput
+                    style={[styles.formInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+                    placeholder="e.g. Block 1 Lot 2"
+                    placeholderTextColor="#555"
+                    value={newUser.block_lot}
+                    onChangeText={t => setNewUser(p => ({ ...p, block_lot: t }))}
+                  />
+                </View>
+                
+                <View style={{ gap: 8 }}>
+                  <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>COMMUNITY ADDRESS</Text>
+                  <TextInput
+                    style={[styles.formInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+                    placeholder="Community Name"
+                    placeholderTextColor="#555"
+                    value={newUser.community}
+                    onChangeText={t => setNewUser(p => ({ ...p, community: t }))}
+                  />
+                </View>
+              </View>
+            )}
+          />
+        </SafeAreaView>
+      </Modal>
+
+      {/* USER DETAIL MODAL */}
+      <Modal visible={showUserDetail} animationType="slide">
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: isDark ? '#0a0a0a' : '#f5f5f5' }]}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => {
+              if (isEditingUser) setIsEditingUser(false);
+              else setShowUserDetail(false);
+            }}>
+              <Text style={{ color: ACCENT, fontWeight: '700' }}>{isEditingUser ? 'Cancel' : 'Back'}</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalHeaderTitle, { color: isDark ? '#fff' : '#000' }]}>
+              {isEditingUser ? 'Edit Profile' : 'User Profile'}
+            </Text>
+            {((role === 'admin') || (role === 'hoa' && !selectedUser?.is_admin)) && (
+              <TouchableOpacity onPress={() => {
+                if (isEditingUser) handleUpdateUser();
+                else {
+                  setEditUser({
+                    name: selectedUser.name,
+                    email: selectedUser.email || '',
+                    block_lot: selectedUser.block_lot || '',
+                    address: selectedUser.address || ''
+                  });
+                  setIsEditingUser(true);
+                }
+              }}>
+                <Text style={{ color: '#2196F3', fontWeight: '900' }}>{isEditingUser ? 'SAVE' : 'EDIT'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {selectedUser && (
+            <FlatList
+              data={[1]}
+              keyExtractor={i => i.toString()}
+              renderItem={() => {
+                const family = allFamilyMembers.filter(f => f.profile_id === selectedUser.id);
+                const userRole = selectedUser.is_admin ? 'Admin/HOA' : (selectedUser.name?.toLowerCase().includes('guard') ? 'Guard' : 'Resident');
+                const hasPush = !!selectedUser.push_token;
+                
+                return (
+                  <View style={{ padding: 24 }}>
+                    {!isEditingUser ? (
+                      <>
+                        <View style={{ alignItems: 'center', marginBottom: 30 }}>
+                          <View style={[styles.detailAvatar, { backgroundColor: isDark ? '#141414' : '#fff' }]}>
+                            <IconSymbol name="person.fill" size={40} color={ACCENT} />
+                          </View>
+                          <Text style={[styles.detailName, { color: isDark ? '#fff' : '#000' }]}>{selectedUser.name}</Text>
+                          <View style={{ flexDirection: 'row', gap: 10, marginTop: 10 }}>
+                            <View style={[styles.roleBadge, { backgroundColor: ACCENT + '15' }]}>
+                              <Text style={{ color: ACCENT, fontWeight: '900', fontSize: 10 }}>{userRole.toUpperCase()}</Text>
+                            </View>
+                            <View style={[styles.roleBadge, { backgroundColor: hasPush ? '#34C75920' : '#55555520' }]}>
+                              <Text style={{ color: hasPush ? '#34C759' : '#888', fontWeight: '900', fontSize: 10 }}>
+                                {hasPush ? '🔔 PUSH ACTIVE' : '🔕 NO PUSH'}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+
+                    <View style={[styles.infoSection, { backgroundColor: isDark ? '#141414' : '#fff' }]}>
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>LOCATION</Text>
+                        <Text style={[styles.infoValue, { color: isDark ? '#fff' : '#000', flex: 1, textAlign: 'right' }]} numberOfLines={2}>
+                          {selectedUser.block_lot || 'N/A'}
+                        </Text>
+                      </View>
+                      <View style={styles.infoRow}>
+                        <Text style={styles.infoLabel}>COMMUNITY</Text>
+                        <Text style={[styles.infoValue, { color: isDark ? '#fff' : '#000', flex: 1, textAlign: 'right' }]} numberOfLines={3}>
+                          {selectedUser.address || selectedUser.community || 'H-Fire Village'}
+                        </Text>
+                      </View>
+                    </View>
+
+                        <Text style={[styles.sectionTitle, { color: isDark ? '#555' : '#888' }]}>FAMILY MEMBERS ({family.length})</Text>
+                        <View style={[styles.infoSection, { backgroundColor: isDark ? '#141414' : '#fff' }]}>
+                          {family.length > 0 ? family.map((f, idx) => (
+                            <View key={idx} style={[styles.infoRow, { borderBottomWidth: idx === family.length - 1 ? 0 : 1, borderBottomColor: 'rgba(128,128,128,0.05)' }]}>
+                              <View>
+                                <Text style={[styles.infoValue, { color: isDark ? '#fff' : '#000' }]}>{f.full_name}</Text>
+                                <Text style={{ fontSize: 10, color: '#888' }}>{f.relationship} • {f.age} yrs old</Text>
+                              </View>
+                              <Text style={{ color: '#2196F3', fontSize: 10, fontWeight: '700' }}>{f.phone}</Text>
+                            </View>
+                          )) : (
+                            <Text style={{ textAlign: 'center', color: '#555', padding: 10 }}>No family members linked.</Text>
+                          )}
+                        </View>
+                      </>
+                    ) : (
+                      <View style={{ gap: 20 }}>
+                        <View style={{ gap: 8 }}>
+                          <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>FULL NAME</Text>
+                          <TextInput
+                            style={[styles.formInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+                            value={editUserData.name}
+                            onChangeText={t => setEditUser(p => ({ ...p, name: t }))}
+                          />
+                        </View>
+                        <View style={{ gap: 8 }}>
+                          <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>LOCATION (BLOCK/LOT)</Text>
+                          <TextInput
+                            style={[styles.formInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+                            value={editUserData.block_lot}
+                            onChangeText={t => setEditUser(p => ({ ...p, block_lot: t }))}
+                          />
+                        </View>
+                        <View style={{ gap: 8 }}>
+                          <Text style={[styles.inputLabel, { color: isDark ? '#555' : '#888' }]}>ADDRESS</Text>
+                          <TextInput
+                            style={[styles.formInput, { backgroundColor: isDark ? '#141414' : '#fff', color: isDark ? '#fff' : '#000' }]}
+                            value={editUserData.address}
+                            onChangeText={t => setEditUser(p => ({ ...p, address: t }))}
+                          />
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                );
+              }}
+            />
+          )}
         </SafeAreaView>
       </Modal>
 
@@ -441,10 +1004,31 @@ const styles = StyleSheet.create({
   modalBackText: { fontSize: 16, fontWeight: '700', marginLeft: 5 },
   modalHeaderTitle: { fontSize: 18, fontWeight: '900' },
   modalList: { padding: 16 },
+  searchContainer: { paddingHorizontal: 16, paddingVertical: 10 },
+  searchInput: { height: 45, borderRadius: 12, paddingHorizontal: 15, fontSize: 14, borderWidth: 1, borderColor: 'rgba(128,128,128,0.1)' },
+  deviceMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(128,128,128,0.05)', gap: 6 },
+  deviceMetaText: { fontSize: 11, fontWeight: '600', color: '#888' },
   userAvatar: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center' },
   userEmail: { fontSize: 12, fontWeight: '700' },
   locationBadge: { backgroundColor: 'rgba(33, 150, 243, 0.1)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
   locationBadgeText: { color: '#2196F3', fontSize: 10, fontWeight: '900' },
+
+  // Form Styles
+  inputLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1.5, marginBottom: 8 },
+  formInput: { height: 50, borderRadius: 12, paddingHorizontal: 16, fontSize: 15, borderWidth: 1, borderColor: 'rgba(128,128,128,0.1)' },
+  errorText: { color: ACCENT, fontSize: 10, fontWeight: '700', marginTop: 4, marginLeft: 4 },
+  roleSelector: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  roleOption: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  roleOptionText: { fontSize: 10, fontWeight: '900' },
+
+  // Detail Styles
+  detailAvatar: { width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center', elevation: 4, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 10 },
+  detailName: { fontSize: 24, fontWeight: '900', marginTop: 16 },
+  infoSection: { borderRadius: 20, padding: 20, gap: 16, marginBottom: 24 },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
+  infoLabel: { fontSize: 9, fontWeight: '900', color: '#888', letterSpacing: 1 },
+  infoValue: { fontSize: 14, fontWeight: '700' },
+  sectionTitle: { fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 12, marginLeft: 10 },
 
   // Broadcast Modal Styles
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 24 },

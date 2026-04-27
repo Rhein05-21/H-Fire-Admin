@@ -1,0 +1,105 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.app_settings (
+  key text NOT NULL,
+  value text NOT NULL,
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT app_settings_pkey PRIMARY KEY (key)
+);
+CREATE TABLE public.call_logs (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  incident_id bigint NOT NULL,
+  profile_id text,
+  family_member_id bigint,
+  phone_number text NOT NULL,
+  call_type text NOT NULL,
+  call_sid text,
+  status text DEFAULT 'initiated'::text,
+  duration_sec integer,
+  attempt integer DEFAULT 1,
+  created_at timestamp with time zone DEFAULT now(),
+  completed_at timestamp with time zone,
+  CONSTRAINT call_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT call_logs_incident_id_fkey FOREIGN KEY (incident_id) REFERENCES public.incidents(id),
+  CONSTRAINT call_logs_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id),
+  CONSTRAINT call_logs_family_member_id_fkey FOREIGN KEY (family_member_id) REFERENCES public.family_members(id)
+);
+CREATE TABLE public.devices (
+  mac text NOT NULL,
+  house_name text NOT NULL,
+  label text NOT NULL,
+  profile_id text,
+  created_at timestamp with time zone DEFAULT now(),
+  last_seen timestamp with time zone,
+  block_lot text,
+  CONSTRAINT devices_pkey PRIMARY KEY (mac)
+);
+CREATE TABLE public.emergency_settings (
+  key text NOT NULL,
+  value text NOT NULL,
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT emergency_settings_pkey PRIMARY KEY (key)
+);
+CREATE TABLE public.family_members (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  profile_id text NOT NULL,
+  full_name text NOT NULL,
+  age integer CHECK (age >= 0 AND age <= 150),
+  relationship text NOT NULL DEFAULT 'Member'::text,
+  email text,
+  phone text NOT NULL,
+  is_primary boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT family_members_pkey PRIMARY KEY (id),
+  CONSTRAINT family_members_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.gas_logs (
+  id bigint NOT NULL DEFAULT nextval('gas_logs_id_seq'::regclass),
+  created_at timestamp with time zone DEFAULT now(),
+  device_mac text,
+  ppm_level integer,
+  status text,
+  profile_id text,
+  CONSTRAINT gas_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT gas_logs_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.incidents (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  device_mac text NOT NULL,
+  status text NOT NULL DEFAULT 'Active'::text,
+  start_time timestamp with time zone DEFAULT now(),
+  end_time timestamp with time zone,
+  resolved_by text,
+  notes text,
+  ppm_at_trigger integer,
+  alert_type text,
+  profile_id text,
+  CONSTRAINT incidents_pkey PRIMARY KEY (id),
+  CONSTRAINT incidents_device_mac_fkey FOREIGN KEY (device_mac) REFERENCES public.devices(mac),
+  CONSTRAINT incidents_resolved_by_fkey FOREIGN KEY (resolved_by) REFERENCES public.profiles(id),
+  CONSTRAINT incidents_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.profiles (
+  id text NOT NULL,
+  name text NOT NULL,
+  block_lot text,
+  updated_at timestamp without time zone DEFAULT '2026-03-22 08:12:34.679343'::timestamp without time zone,
+  latitude double precision,
+  longitude double precision,
+  is_admin boolean DEFAULT false,
+  push_token text,
+  emergency_hotline text DEFAULT '+639XXXXXXXXX'::text,
+  address text,
+  CONSTRAINT profiles_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.user_push_tokens (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  profile_id text,
+  token text NOT NULL UNIQUE,
+  device_info jsonb,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT user_push_tokens_pkey PRIMARY KEY (id),
+  CONSTRAINT user_push_tokens_profile_id_fkey FOREIGN KEY (profile_id) REFERENCES public.profiles(id)
+);
